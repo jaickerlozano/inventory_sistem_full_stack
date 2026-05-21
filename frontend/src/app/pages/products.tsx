@@ -40,7 +40,7 @@ export function Products() {
       setFilteredProducts(products);
     } else {
       const filtered = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.sku.toString().includes(searchTerm)
       );
       setFilteredProducts(filtered);
     }
@@ -171,7 +171,7 @@ export function Products() {
             <li 
               key={product.id}
               >
-              Product: {product.name} / Current Stock: {product.current_stock}
+              Product: {product.name} / SKU: {product.sku} / Current Stock: {product.current_stock}
             </li>
           ))}
         </ul>
