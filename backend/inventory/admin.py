@@ -3,7 +3,7 @@ from .models import Product, Category, Supplier, StockMovement
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'current_stock', 'minimum_stock', 'maximum_stock')
+    list_display = ('name', 'sku', 'description', 'supplier', 'category', 'current_stock', 'minimum_stock', 'price')
     search_fields = ('name', 'category__name')
     list_filter = ('category',)
     ordering = ('name',)
