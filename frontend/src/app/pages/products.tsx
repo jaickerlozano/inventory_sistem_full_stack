@@ -7,6 +7,7 @@ import { ENDPOINTS } from "@/lib/utils";
 
 export function Products() {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -21,13 +22,29 @@ export function Products() {
     supplier: '',
     price: '',
   })
+  const [searchTerm, setSearchTerm] = useState('');
+  
 
   useEffect(() => {
     setIsLoading(true);
-    loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts).finally(() => setIsLoading(false));
+    loadDataFromAPI(ENDPOINTS.PRODUCTS, (data) => {
+      setProducts(data);
+      setFilteredProducts(data); // Inicialmente muestra todos
+    }).finally(() => setIsLoading(false));
     loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories);
     loadDataFromAPI(ENDPOINTS.SUPPLIERS, setSuppliers);
   }, [])
+
+  useEffect(() => {
+    if (searchTerm === '') {
+      setFilteredProducts(products);
+    } else {
+      const filtered = products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [searchTerm, products]);
 
   const handleAddProduct = async (e) => {
     e.preventDefault();
@@ -60,6 +77,7 @@ export function Products() {
         price: '',
       });
       await loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts);
+      setFilteredProducts(products);
       alert("Producto agregado exitosamente!");
     } catch (error) {
       console.error("Error al agregar el producto:", error);
@@ -136,10 +154,20 @@ export function Products() {
           </div>
         )}
       </div>
+
+      <div>
+        <h3>Filtrar productos</h3>
+        <input 
+          type="text" placeholder="Buscar por nombre..." 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       <div>
         <h2>Lista de productos</h2>
         <ul>
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <li 
               key={product.id}
               >
