@@ -30,3 +30,17 @@ export const postDataToAPI = async (endpoint, data) => {
     throw error;
   }
 }
+
+export const deleteDataFromAPI = async (endpoint) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}/`, {
+      method: "DELETE",
+    });
+    console.log(response)
+    if(!response.ok)
+      return await response.json();
+    } catch (error) {
+      console.error('Error al eliminar:', error);
+      throw error;
+    }
+}

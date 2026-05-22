@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { loadDataFromAPI, postDataToAPI } from "../../services/api";
+import { loadDataFromAPI, postDataToAPI, deleteDataFromAPI } from "../../services/api";
 import { Button } from "@/app/components/Button";
 import { Modal } from "@/app/components/ui/Modal";
-import { Plus } from "lucide-react";
+import { Plus, Search, Trash, X, Edit, Check } from "lucide-react";
 import { ENDPOINTS } from "@/lib/utils";
 
 export function Products() {
@@ -85,6 +85,22 @@ export function Products() {
     }
   }
 
+  const handleDeleteProduct = async (productId) => {
+    if (!window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
+      return;
+    }
+    console.log("Eliminando producto con ID:", productId);
+    try {
+      await deleteDataFromAPI(`${ENDPOINTS.PRODUCTS}/${productId}`);
+      await loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts);
+      setFilteredProducts(products);
+      alert("Producto eliminado exitosamente!");
+    } catch (error) {
+      console.error("Error al eliminar el producto:", error);
+      alert("Error al eliminar el producto.");  
+    }
+  }
+
   return (
     <div>
       <h1>Product List</h1>
@@ -94,6 +110,7 @@ export function Products() {
 
         {isOpen && (
           <div>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><Button onClick={() => setIsOpen(false)}><X /></Button></div>
             <div>
               <form action="" onSubmit={(e) => {
                 e.preventDefault();
@@ -149,6 +166,10 @@ export function Products() {
                   type="submit" className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
                     Guardar
                 </button>
+                <button
+                  type="button" onClick={() => setIsOpen(false)} className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 ml-2">
+                  Cancelar
+                </button>
               </form>
             </div>
           </div>
@@ -172,6 +193,11 @@ export function Products() {
               key={product.id}
               >
               Product: {product.name} / SKU: {product.sku} / Current Stock: {product.current_stock}
+              <div>
+                <button type="button"
+                ><Edit/></button>
+                <button type="button" onClick={() => handleDeleteProduct(product.id)}><Trash /></button>
+              </div>
             </li>
           ))}
         </ul>
