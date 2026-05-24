@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Count, F, Sum
+from rest_framework.decorators import action
 from .serializer import ProductSerializer, CategorySerializer, SupplierSerializer, StockMovementSerializer
 from .models import Product, Category, Supplier, StockMovement
 
@@ -91,6 +92,17 @@ class ProductViewSet(viewsets.ModelViewSet):
             )
 
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def lowstockproducts(self, request):
+        """
+        GET /api/inventory/products/lowstockproducts/
+        Retorna productos con stock por debajo del mínimo
+        """
+        lowstockproducts = self.queryset.filter(current_stock__lt=F('minimum_stock'))
+        serializer = self.get_serializer(lowstockproducts, many=True)
+        return Response(serializer.data)
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
