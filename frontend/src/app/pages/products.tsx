@@ -74,16 +74,18 @@ export function Products() {
     }
 
     try {
-      await postDataToAPI(ENDPOINTS.PRODUCTS, {
+      const payload = {
         name: newProduct.name,
-        sku: newProduct.sku,
+        sku: newProduct.sku || null,
         description: newProduct.description,
         current_stock: newProduct.current_stock,
         minimum_stock: newProduct.minimum_stock,
         category: newProduct.category,
         supplier: newProduct.supplier,
         price: newProduct.price,
-      });
+      }
+
+      await postDataToAPI(ENDPOINTS.PRODUCTS, payload);
 
       setNewProduct({
         name: '',
@@ -189,11 +191,11 @@ export function Products() {
                    value={newProduct.description}
                    onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
                 />
-                <input type="text" placeholder="Stock actual..." 
+                <input type="number" placeholder="Stock actual..." 
                    value={newProduct.current_stock}
                    onChange={(e) => setNewProduct({...newProduct, current_stock: e.target.value})}
                    required/>
-                <input type="text" placeholder="Stock mínimo..." 
+                <input type="number" placeholder="Stock mínimo..." 
                    value={newProduct.minimum_stock}
                    onChange={(e) => setNewProduct({...newProduct, minimum_stock: e.target.value})}
                    required/>
@@ -212,13 +214,14 @@ export function Products() {
                   value={newProduct.supplier}
                   onChange={(e) => setNewProduct({...newProduct, supplier: e.target.value})}
                 >
+                  <option value="">Selecciona un proveedor</option> 
                   {suppliers.map((supplier) => (
                     <option key={supplier.id} value={supplier.id}>
                       {supplier.name}
                     </option>
                   ))}
                 </select>
-                <input type="text" placeholder="Precio del producto..." 
+                <input type="number" placeholder="Precio del producto..." 
                    value={newProduct.price}
                    onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
                    required/>
