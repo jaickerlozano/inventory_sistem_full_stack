@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from rest_framework import routers
-from inventory.views import ProductViewSet, CategoryViewSet, SupplierViewSet, StockMovementViewSet
+from inventory.views import ProductViewSet, CategoryViewSet, SupplierViewSet, StockMovementViewSet, DashboardView
 
 router = routers.DefaultRouter() # Create a router and register our viewsets with it.
 router.register(r'products', ProductViewSet, 'products')
@@ -13,6 +13,7 @@ router.register(r'stock-movements', StockMovementViewSet, 'stock-movements')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/inventory/', include(router.urls)),
+    path('api/inventory/dashboard/', DashboardView.as_view(), name='dashboard'),
     # API schema (JSON o YAML)
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     # UI Swagger
