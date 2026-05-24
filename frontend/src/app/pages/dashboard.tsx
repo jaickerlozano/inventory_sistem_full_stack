@@ -5,24 +5,29 @@ import { loadDataFromAPI } from '../../services/api';
 export function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState({});
+  const [lowStockProducts, setLowStockProducts] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAll = async () => {
       setIsLoading(true);
       try {
-        await loadDataFromAPI(ENDPOINTS.DASHBOARD, setDashboardData);
+        await Promise.all([
+          loadDataFromAPI(ENDPOINTS.DASHBOARD, setDashboardData),
+          loadDataFromAPI(ENDPOINTS.LOW_STOCK_PRODUCTS, setLowStockProducts),
+        ]);
       } catch (error) {
-        console.error("Error al cargar los datos del dashboard:", error);
+        console.error("Error cargando datos:", error);
       } finally {
-        setIsLoading(false);  
+        setIsLoading(false);
       }
     };
-    fetchData();
+    fetchAll();
   }, []);
 
   useEffect(() => {
     console.log("Datos recibidos:", dashboardData);
-  }, [dashboardData]);
+    console.log("Datos recibidos:", lowStockProducts);
+  }, [dashboardData, lowStockProducts]);
 
   return (
     <div className="p-8">
@@ -38,7 +43,7 @@ export function Dashboard() {
                 <p>Total de productos: {dashboardData.total_products}</p>
                 <p>Productos con stock bajo: {dashboardData.low_stock_products}</p>
                 <p>Valor del inventario: ${dashboardData.inventory_value}</p>
-                <p>Movimientos: {dashboardData.total_stock_movements}</p>
+                <p>Movimientos: {lowStockProducts.length}</p>
               </div>
               <div>
                 <div>
@@ -59,11 +64,17 @@ export function Dashboard() {
               <div>
                 <h2>Productos con Bajo Stock</h2>
                 <p>Productos que requieren reposición urgente</p>
-                <ul>
-                  {/* {dashboardData.low_stock_products?.map((product: any) => (
-                    <li key={product.id}>{product.name} - Stock: {product.stock}</li>
-                  ))} */}
-                </ul>
+                {lowStockProducts.length > 0 ? (
+                  <ul>
+                    {lowStockProducts.map((product) => (
+                      <li key={product.id}>
+                        {product.name} - Stock: {product.current_stock} (Mínimo: {product.minimum_stock})
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No hay productos con stock bajo</p>
+                )}
               </div>
             </div>
           ) : (
