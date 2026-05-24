@@ -23,6 +23,7 @@ export function Products() {
     price: '',
   }) // Almacena los datos del nuevo producto que se va a agregar o editar
   const [searchTerm, setSearchTerm] = useState(''); // Almacena el término de búsqueda para filtrar productos
+  const [searchCategory, setSearchCategory] = useState(''); // Almacena la categoría seleccionada para filtrar productos
   const [editingProduct, setEditingProduct] = useState(null); // Almacena el producto que estamos editando
   const [isEditOpen, setIsEditOpen] = useState(false); // Controla la visibilidad del modal para editar los productos
 
@@ -39,15 +40,23 @@ export function Products() {
 
   // Filtra los productos según el término de búsqueda
   useEffect(() => {
-    if (searchTerm === '') {
-      setFilteredProducts(products);
-    } else {
-      const filtered = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.sku.toString().includes(searchTerm)
+    let filtered = products;
+
+    // Filtro 1: Por término de búsqueda
+    if (searchTerm !== '') {
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        product.sku.toString().includes(searchTerm)
       );
-      setFilteredProducts(filtered);
     }
-  }, [searchTerm, products]);
+
+    // Filtro 2: Por categoría (se aplica DESPUÉS del primer filtro)
+    if (searchCategory !== '') {
+      filtered = filtered.filter(product => product.category === searchCategory);
+    }
+
+    setFilteredProducts(filtered);
+  }, [searchTerm, searchCategory, products]);
 
   // Esta función se encarga de agregar un nuevo producto utilizando los datos del formulario
   const handleAddProduct = async (e) => {
@@ -183,9 +192,10 @@ export function Products() {
                    onChange={(e) => setNewProduct({...newProduct, minimum_stock: e.target.value})}
                    required/>
                 <select
-                  value={newProduct.category}
-                  onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
+                  value={newProduct.category ? newProduct.category.toString() : ''}
+                  onChange={(e) => setNewProduct({...newProduct, category: e.target.value ? parseInt(e.target.value) : ''})}
                 >
+                  <option value="">Selecciona una categoría</option>
                   {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
@@ -220,13 +230,27 @@ export function Products() {
         )}
       </div>
 
+      {/* Barra de búsqueda */}
       <div>
-        <h3>Filtrar productos</h3>
-        <input 
-          type="text" placeholder="Buscar por nombre..." 
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+          <h3>Filtrar productos</h3>
+        <div>
+          <input 
+            type="text" placeholder="Buscar por nombre..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <select 
+            value={searchCategory.toString()}
+            onChange={(e) => setSearchCategory(e.target.value ? parseInt(e.target.value) : '')}
+          >
+            <option value="">Todas las categorías</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Modal de edición */}
@@ -274,9 +298,10 @@ export function Products() {
                 required
               />
               <select
-                value={editingProduct.category}
-                onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
+                value={editingProduct.category ? editingProduct.category.toString() : ''}
+                onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value ? parseInt(e.target.value) : ''})}
               >
+                <option value="">Selecciona una categoría</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
