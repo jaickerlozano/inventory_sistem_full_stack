@@ -30,14 +30,22 @@ export function Products() {
 
   // Carga los productos, categorías y proveedores al montar el componente
   useEffect(() => {
-    setIsLoading(true);
-    loadDataFromAPI(ENDPOINTS.PRODUCTS, (data) => {
-      setProducts(data);
-      setFilteredProducts(data); // Inicialmente muestra todos
-    }).finally(() => setIsLoading(false));
-    loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories);
-    loadDataFromAPI(ENDPOINTS.SUPPLIERS, setSuppliers);
-  }, [])
+    const fetchAll = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([
+          loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts),
+          loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories),
+          loadDataFromAPI(ENDPOINTS.SUPPLIERS, setSuppliers),
+        ]);
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchAll();
+  }, []);
 
   // Filtra los productos según el término de búsqueda
   useEffect(() => {

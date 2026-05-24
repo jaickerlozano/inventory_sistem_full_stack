@@ -4,10 +4,28 @@ import { loadDataFromAPI } from "../../services/api";
 
 export function Categories() {
   const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories);
+    const fetchCategories = async () => {
+      setIsLoading(true);
+      try {
+        await loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories);
+      } catch (error) {
+        console.error("Error al cargar las categorías:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCategories();      
   }, []);
+
+  // Nuevo useEffect que se ejecuta cuando categories cambia
+  useEffect(() => {
+    if (categories.length > 0) {
+      console.log("Categorías cargadas:", categories);
+    }
+  }, [categories]);
 
   return (
     <div>
