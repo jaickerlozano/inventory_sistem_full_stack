@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import { loadDataFromAPI, postDataToAPI, deleteDataFromAPI } from "../../services/api";
+import { loadDataFromAPI, postDataToAPI, deleteDataFromAPI, putDataToFromAPI } from "../../services/api";
 import { Button } from "@/app/components/Button";
 import { Modal } from "@/app/components/ui/Modal";
 import { Plus, Search, Trash, X, Edit, Check } from "lucide-react";
 import { ENDPOINTS } from "@/lib/utils";
 
 export function Products() {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [suppliers, setSuppliers] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState([]); // Almacena la lista completa de productos
+  const [filteredProducts, setFilteredProducts] = useState([]); // Almacena la lista de productos filtrados según el término de búsqueda
+  const [categories, setCategories] = useState([]); // Almacena la lista de categorías para el formulario
+  const [suppliers, setSuppliers] = useState([]); // Almacena la lista de proveedores para el formulario
+  const [isOpen, setIsOpen] = useState(false); // Controla la visibilidad del modal para agregar/editar productos
+  const [isLoading, setIsLoading] = useState(false); // Controla el estado de carga de los datos
   const [newProduct, setNewProduct] = useState({
     name: '',
     sku: '',
@@ -21,10 +21,11 @@ export function Products() {
     category: '',
     supplier: '',
     price: '',
-  })
-  const [searchTerm, setSearchTerm] = useState('');
-  
+  }) // Almacena los datos del nuevo producto que se va a agregar o editar
+  const [searchTerm, setSearchTerm] = useState(''); // Almacena el término de búsqueda para filtrar productos
+  const [editingProduct, setEditingProduct] = useState(null); // Almacena el producto que estamos editando
 
+  // Carga los productos, categorías y proveedores al montar el componente
   useEffect(() => {
     setIsLoading(true);
     loadDataFromAPI(ENDPOINTS.PRODUCTS, (data) => {
@@ -35,6 +36,7 @@ export function Products() {
     loadDataFromAPI(ENDPOINTS.SUPPLIERS, setSuppliers);
   }, [])
 
+  // Filtra los productos según el término de búsqueda
   useEffect(() => {
     if (searchTerm === '') {
       setFilteredProducts(products);
@@ -46,11 +48,12 @@ export function Products() {
     }
   }, [searchTerm, products]);
 
+  // Esta función se encarga de agregar un nuevo producto utilizando los datos del formulario
   const handleAddProduct = async (e) => {
     e.preventDefault();
 
     if (!newProduct.name || !newProduct.current_stock || !newProduct.minimum_stock) {
-      alert("Please fill in all required fields.");
+      alert("Por favor llena todos los campos requeridos.");
       return;
     }
 
@@ -85,6 +88,7 @@ export function Products() {
     }
   }
 
+  // Esta función se encarga de eliminar un producto dado su ID
   const handleDeleteProduct = async (productId) => {
     if (!window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
       return;
@@ -98,6 +102,45 @@ export function Products() {
     } catch (error) {
       console.error("Error al eliminar el producto:", error);
       alert("Error al eliminar el producto.");  
+    }
+  }
+
+  // Esta función se encarga de abrir el modal de edición y cargar los datos del producto seleccionado
+  const handleEditProduct = (product) => {
+    setEditingProduct(product);
+    setIsOpen(true);
+  }
+
+  // Esta función se encarga de guardar los cambios después de editar un producto
+  const handleSaveEditProduct = async (e) => {
+    e.preventDefault();
+
+    if (!editingProduct.name || !editingProduct.current_stock || !editingProduct.minimum_stock) {
+      alert("Por favor llena todos los campos requeridos.");
+      return;
+    }
+
+    try {
+      // Aquí se actualiza el producto en el backend
+      await putDataToFromAPI(`${ENDPOINTS.PRODUCTS}/${editingProduct.id}`, {
+        name: editingProduct.name,
+        sku: editingProduct.sku,
+        description: editingProduct.description,
+        current_stock: editingProduct.current_stock,
+        minimum_stock: editingProduct.minimum_stock,
+        category: editingProduct.category,
+        supplier: editingProduct.supplier,
+        price: editingProduct.price,
+      });
+
+      // Recarga la lista de productos después de la edición
+      await loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts);
+      setIsOpen(false);
+      setEditingProduct(null);
+      alert("Producto editado exitosamente!");
+    } catch (error) {
+      console.error("Error al editar el producto:", error);
+      alert("Error al editar el producto.");
     }
   }
 
@@ -185,6 +228,91 @@ export function Products() {
         />
       </div>
 
+      {/* Modal de edición */}
+
+      {isOpen && editingProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-md">
+            <div className="flex justify-between items-center mb-4">
+              <h2>Editar Producto</h2>
+              <button onClick={() => setIsEditOpen(false)}><X /></button>
+            </div>
+            <form onSubmit={handleSaveEditProduct}>
+              <input
+                type="text"
+                placeholder="Nombre del producto..."
+                value={editingProduct.name}
+                onChange={(e) => setEditingProduct({...editingProduct, name: e.target.value})}
+                required
+              />
+              <input
+                type="text"
+                placeholder="SKU del producto..."
+                value={editingProduct.sku}
+                onChange={(e) => setEditingProduct({...editingProduct, sku: e.target.value})}
+              />
+              <input
+                type="text"
+                placeholder="Descripción del producto..."
+                value={editingProduct.description}
+                onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
+              />
+              <input
+                type="text"
+                placeholder="Stock actual..."
+                value={editingProduct.current_stock}
+                onChange={(e) => setEditingProduct({...editingProduct, current_stock: e.target.value})}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Stock mínimo..."
+                value={editingProduct.minimum_stock}
+                onChange={(e) => setEditingProduct({...editingProduct, minimum_stock: e.target.value})}
+                required
+              />
+              <select
+                value={editingProduct.category}
+                onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value})}
+              >
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={editingProduct.supplier}
+                onChange={(e) => setEditingProduct({...editingProduct, supplier: e.target.value})}
+              >
+                {suppliers.map((supplier) => (
+                  <option key={supplier.id} value={supplier.id}>
+                    {supplier.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="text"
+                placeholder="Precio del producto..."
+                value={editingProduct.price}
+                onChange={(e) => setEditingProduct({...editingProduct, price: e.target.value})}
+                required
+              />
+              <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
+                Guardar
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="mt-4 px-4 py-2 bg-gray-600 text-white rounded ml-2"
+              >
+                Cancelar
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div>
         <h2>Lista de productos</h2>
         <ul>
@@ -194,7 +322,7 @@ export function Products() {
               >
               Product: {product.name} / SKU: {product.sku} / Current Stock: {product.current_stock}
               <div>
-                <button type="button"
+                <button type="button" onClick={() => handleEditProduct(product)}
                 ><Edit/></button>
                 <button type="button" onClick={() => handleDeleteProduct(product.id)}><Trash /></button>
               </div>

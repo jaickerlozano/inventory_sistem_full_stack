@@ -31,6 +31,24 @@ export const postDataToAPI = async (endpoint, data) => {
   }
 }
 
+export const putDataToFromAPI = async (endpoint, data) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}/`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error al actualizar:', error);
+    throw error;
+  }
+}
+
+
 export const deleteDataFromAPI = async (endpoint) => {
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}/`, {
