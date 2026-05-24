@@ -5,18 +5,21 @@ import { Suppliers } from "./pages/suppliers"
 import { Categories } from "./pages/categories"
 import { StockMovements } from "./pages/stock_movements"
 import { Alerts } from "./pages/alerts"
+import { Layout } from "./components/layout"
 
 function App() {
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
           <Route path="products" element={<Products />} />
           <Route path="suppliers" element={<Suppliers />} />
           <Route path="categories" element={<Categories />} />
           <Route path="movements" element={<StockMovements />} />
           <Route path="alerts" element={<Alerts />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )
