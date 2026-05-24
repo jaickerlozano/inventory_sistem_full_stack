@@ -24,6 +24,7 @@ export function Products() {
   }) // Almacena los datos del nuevo producto que se va a agregar o editar
   const [searchTerm, setSearchTerm] = useState(''); // Almacena el término de búsqueda para filtrar productos
   const [searchCategory, setSearchCategory] = useState(''); // Almacena la categoría seleccionada para filtrar productos
+  const [searchSupplier, setSearchSupplier] = useState(''); // Almacena el proveedor seleccionado para filtrar productos
   const [editingProduct, setEditingProduct] = useState(null); // Almacena el producto que estamos editando
   const [isEditOpen, setIsEditOpen] = useState(false); // Controla la visibilidad del modal para editar los productos
 
@@ -55,8 +56,13 @@ export function Products() {
       filtered = filtered.filter(product => product.category === searchCategory);
     }
 
+    // Filtro 3: Por proveedor (se aplica DESPUÉS del segundo filtro)
+    if (searchSupplier !== '') {
+      filtered = filtered.filter(product => product.supplier === searchSupplier);
+    }
+
     setFilteredProducts(filtered);
-  }, [searchTerm, searchCategory, products]);
+  }, [searchTerm, searchCategory, searchSupplier, products]);
 
   // Esta función se encarga de agregar un nuevo producto utilizando los datos del formulario
   const handleAddProduct = async (e) => {
@@ -247,6 +253,17 @@ export function Products() {
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={searchSupplier}
+            onChange={(e) => setSearchSupplier(e.target.value ? parseInt(e.target.value) : '')}
+          >
+            <option value="">Todos los proveedores</option>
+            {suppliers.map((supplier) => (
+              <option key={supplier.id} value={supplier.id}>
+                {supplier.name}
               </option>
             ))}
           </select>
