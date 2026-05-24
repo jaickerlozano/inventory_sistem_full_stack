@@ -10,7 +10,7 @@ export function Products() {
   const [filteredProducts, setFilteredProducts] = useState([]); // Almacena la lista de productos filtrados según el término de búsqueda
   const [categories, setCategories] = useState([]); // Almacena la lista de categorías para el formulario
   const [suppliers, setSuppliers] = useState([]); // Almacena la lista de proveedores para el formulario
-  const [isOpen, setIsOpen] = useState(false); // Controla la visibilidad del modal para agregar/editar productos
+  const [isOpen, setIsOpen] = useState(false); // Controla la visibilidad del modal para agregar
   const [isLoading, setIsLoading] = useState(false); // Controla el estado de carga de los datos
   const [newProduct, setNewProduct] = useState({
     name: '',
@@ -24,6 +24,7 @@ export function Products() {
   }) // Almacena los datos del nuevo producto que se va a agregar o editar
   const [searchTerm, setSearchTerm] = useState(''); // Almacena el término de búsqueda para filtrar productos
   const [editingProduct, setEditingProduct] = useState(null); // Almacena el producto que estamos editando
+  const [isEditOpen, setIsEditOpen] = useState(false); // Controla la visibilidad del modal para editar los productos
 
   // Carga los productos, categorías y proveedores al montar el componente
   useEffect(() => {
@@ -108,7 +109,7 @@ export function Products() {
   // Esta función se encarga de abrir el modal de edición y cargar los datos del producto seleccionado
   const handleEditProduct = (product) => {
     setEditingProduct(product);
-    setIsOpen(true);
+    setIsEditOpen(true);
   }
 
   // Esta función se encarga de guardar los cambios después de editar un producto
@@ -230,7 +231,8 @@ export function Products() {
 
       {/* Modal de edición */}
 
-      {isOpen && editingProduct && (
+      {isEditOpen && editingProduct && (
+
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-lg max-w-md">
             <div className="flex justify-between items-center mb-4">
@@ -303,7 +305,7 @@ export function Products() {
               </button>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={() => setIsEditOpen(false)}
                 className="mt-4 px-4 py-2 bg-gray-600 text-white rounded ml-2"
               >
                 Cancelar
