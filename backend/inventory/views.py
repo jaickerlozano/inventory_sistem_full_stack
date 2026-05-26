@@ -125,6 +125,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class SupplierViewSet(viewsets.ModelViewSet):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {
+        'name': ['icontains'], # Permite filtrar por nombre (contiene)
+        'contact_person': ['icontains'], # Permite filtrar por persona de contacto (contiene)
+        'contact_email': ['icontains'], # Permite filtrar por email de contacto (contiene)
+        'contact_phone': ['icontains'], # Permite filtrar por teléfono de contacto (contiene)
+    }
 
 
 from rest_framework import viewsets, status
