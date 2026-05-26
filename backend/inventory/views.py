@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from django.db.models import Count, F, Sum
 from rest_framework.decorators import action
@@ -43,6 +44,18 @@ class DashboardView(APIView):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend]
+    # Configuramos los campos por los que se puede filtrar en la API de productos
+    filterset_fields = {
+        'category': ['exact'], # Permite filtrar por el id de la categoría (exacto)
+        'supplier': ['exact'], # Permite filtrar por el id del proveedor (exacto)
+        'current_stock': ['lt', 'gt', 'exact'], # Permite filtrar por stock actual (menor que, mayor que, igual a)
+        'price': ['lt', 'gt', 'exact'], # Permite filtrar por precio (menor que, mayor que, igual a)
+        'minimum_stock': ['lt', 'gt', 'exact'], # Permite filtrar por stock mínimo (menor que, mayor que, igual a)
+        'name': ['icontains'], # Permite filtrar por nombre (contiene)
+        'sku': ['icontains'], # Permite filtrar por SKU (contiene)
+        'description': ['icontains'], # Permite filtrar por descripción (contiene)
+    }
 
     # Sobreescribimos el método create para manejar la lógica de creación de productos con stock inicial
     def create(self, request, *args, **kwargs):
