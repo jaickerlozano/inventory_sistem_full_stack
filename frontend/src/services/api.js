@@ -7,12 +7,35 @@ export const loadDataFromAPI = async (endpoint, setData) => {
       throw new Error(`Error ${response.status}: ${response.statusText}`);
     }
     const data = await response.json();
-    setData(data);
+    // Se preserva la estructura que viene del backend
+    const processedData = data.results || data;
+    setData(processedData);
   } catch (error) {
     console.error('Error al cargar:', error);
     throw error;
   }
 }
+
+// Nueva función para cargar con parámetros de filtro
+export const loadFilteredDataFromAPI = async (endpoint, filters, setData) => {
+  try {
+    const queryParams = new URLSearchParams();
+    Object.keys(filters).forEach(key => {
+      if (filters[key]) queryParams.append(key, filters[key]);
+    });
+    const url = `${API_BASE_URL}${endpoint}/?${queryParams.toString()}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Error ${response.status}: ${response.statusText}`);
+    }
+    const data = await response.json();
+    const arrayData = data.results ? data.results : Array.isArray(data) ? data : [];
+    setData(arrayData);
+  } catch (error) {
+    console.error('Error al cargar datos filtrados:', error);
+    throw error;
+  }
+} 
 
 export const postDataToAPI = async (endpoint, data) => {
   try {

@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import { loadDataFromAPI, postDataToAPI, deleteDataFromAPI, putDataToFromAPI } from "../../services/api";
+import { loadDataFromAPI, loadFilteredDataFromAPI, postDataToAPI, deleteDataFromAPI, putDataToFromAPI } from "../../services/api";
 import { Button } from "@/app/components/Button";
 import { Modal } from "@/app/components/ui/Modal";
 import { Plus, Search, Trash, X, Edit, Check } from "lucide-react";
 import { ENDPOINTS } from "@/lib/utils";
 
 export function Products() {
-  const [products, setProducts] = useState([]); // Almacena la lista completa de productos
-  const [filteredProducts, setFilteredProducts] = useState([]); // Almacena la lista de productos filtrados según el término de búsqueda
-  const [categories, setCategories] = useState([]); // Almacena la lista de categorías para el formulario
-  const [suppliers, setSuppliers] = useState([]); // Almacena la lista de proveedores para el formulario
-  const [isOpen, setIsOpen] = useState(false); // Controla la visibilidad del modal para agregar
-  const [isLoading, setIsLoading] = useState(false); // Controla el estado de carga de los datos
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: '',
     sku: '',
@@ -21,58 +20,79 @@ export function Products() {
     category: '',
     supplier: '',
     price: '',
-  }) // Almacena los datos del nuevo producto que se va a agregar o editar
-  const [searchTerm, setSearchTerm] = useState(''); // Almacena el término de búsqueda para filtrar productos
-  const [searchCategory, setSearchCategory] = useState(''); // Almacena la categoría seleccionada para filtrar productos
-  const [searchSupplier, setSearchSupplier] = useState(''); // Almacena el proveedor seleccionado para filtrar productos
-  const [editingProduct, setEditingProduct] = useState(null); // Almacena el producto que estamos editando
-  const [isEditOpen, setIsEditOpen] = useState(false); // Controla la visibilidad del modal para editar los productos
+  })
+  
+  // Filtros que se enviarán al backend
+  const [filters, setFilters] = useState({
+    name__icontains: '',
+    category: '',
+    supplier: '',
+  });
+  
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
-  // Carga los productos, categorías y proveedores al montar el componente
+  // Carga datos iniciales (categorías, proveedores)
   useEffect(() => {
-    const fetchAll = async () => {
+    const fetchInitialData = async () => {
       setIsLoading(true);
       try {
         await Promise.all([
-          loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts),
           loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories),
           loadDataFromAPI(ENDPOINTS.SUPPLIERS, setSuppliers),
         ]);
       } catch (error) {
-        console.error("Error cargando datos:", error);
+        console.error("Error cargando datos iniciales:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchAll();
+    fetchInitialData();
   }, []);
 
-  // Filtra los productos según el término de búsqueda
+  // Carga productos filtrados cuando los filtros cambian
   useEffect(() => {
-    let filtered = products;
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        // Solo enviar filtros que tengan valor
+        const activeFilters = Object.fromEntries(
+          Object.entries(filters).filter(([_, value]) => value !== '')
+        );
+        await loadFilteredDataFromAPI(ENDPOINTS.PRODUCTS, activeFilters, setProducts);
+      } catch (error) {
+        console.error("Error cargando productos:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [filters]);
 
-    // Filtro 1: Por término de búsqueda
-    if (searchTerm !== '') {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        product.sku.toString().includes(searchTerm)
-      );
-    }
+  // Actualizar filtro de búsqueda por nombre
+  const handleSearchChange = (e) => {
+    setFilters({
+      ...filters,
+      name__icontains: e.target.value, 
+    });
+  };
 
-    // Filtro 2: Por categoría (se aplica DESPUÉS del primer filtro)
-    if (searchCategory !== '') {
-      filtered = filtered.filter(product => product.category === searchCategory);
-    }
+  // Actualizar filtro de categoría
+  const handleCategoryChange = (e) => {
+    setFilters({
+      ...filters,
+      category: e.target.value
+    });
+  };
 
-    // Filtro 3: Por proveedor (se aplica DESPUÉS del segundo filtro)
-    if (searchSupplier !== '') {
-      filtered = filtered.filter(product => product.supplier === searchSupplier);
-    }
+  // Actualizar filtro de proveedor
+  const handleSupplierChange = (e) => {
+    setFilters({
+      ...filters,
+      supplier: e.target.value
+    });
+  };
 
-    setFilteredProducts(filtered);
-  }, [searchTerm, searchCategory, searchSupplier, products]);
-
-  // Esta función se encarga de agregar un nuevo producto utilizando los datos del formulario
   const handleAddProduct = async (e) => {
     e.preventDefault();
 
@@ -105,8 +125,12 @@ export function Products() {
         supplier: '',
         price: '',
       });
-      await loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts);
-      setFilteredProducts(products);
+      
+      // Recargar productos con los filtros actuales
+      const activeFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '')
+      );
+      await loadFilteredDataFromAPI(ENDPOINTS.PRODUCTS, activeFilters, setProducts);
       alert("Producto agregado exitosamente!");
     } catch (error) {
       console.error("Error al agregar el producto:", error);
@@ -114,16 +138,19 @@ export function Products() {
     }
   }
 
-  // Esta función se encarga de eliminar un producto dado su ID
   const handleDeleteProduct = async (productId) => {
     if (!window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
       return;
     }
-    console.log("Eliminando producto con ID:", productId);
+    
     try {
       await deleteDataFromAPI(`${ENDPOINTS.PRODUCTS}/${productId}`);
-      await loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts);
-      setFilteredProducts(products);
+      
+      // Recargar productos con los filtros actuales
+      const activeFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '')
+      );
+      await loadFilteredDataFromAPI(ENDPOINTS.PRODUCTS, activeFilters, setProducts);
       alert("Producto eliminado exitosamente!");
     } catch (error) {
       console.error("Error al eliminar el producto:", error);
@@ -131,13 +158,11 @@ export function Products() {
     }
   }
 
-  // Esta función se encarga de abrir el modal de edición y cargar los datos del producto seleccionado
   const handleEditProduct = (product) => {
     setEditingProduct(product);
     setIsEditOpen(true);
   }
 
-  // Esta función se encarga de guardar los cambios después de editar un producto
   const handleSaveEditProduct = async (e) => {
     e.preventDefault();
 
@@ -147,7 +172,6 @@ export function Products() {
     }
 
     try {
-      // Aquí se actualiza el producto en el backend
       await putDataToFromAPI(`${ENDPOINTS.PRODUCTS}/${editingProduct.id}`, {
         name: editingProduct.name,
         sku: editingProduct.sku,
@@ -159,9 +183,12 @@ export function Products() {
         price: editingProduct.price,
       });
 
-      // Recarga la lista de productos después de la edición
-      await loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts);
-      setIsOpen(false);
+      // Recargar productos con los filtros actuales
+      const activeFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, value]) => value !== '')
+      );
+      await loadFilteredDataFromAPI(ENDPOINTS.PRODUCTS, activeFilters, setProducts);
+      setIsEditOpen(false);
       setEditingProduct(null);
       alert("Producto editado exitosamente!");
     } catch (error) {
@@ -247,18 +274,18 @@ export function Products() {
         )}
       </div>
 
-      {/* Barra de búsqueda */}
+      {/* Barra de búsqueda - ahora envia los filtros al backend */}
       <div>
-          <h3>Filtrar productos</h3>
+        <h3>Filtrar productos</h3>
         <div>
           <input 
             type="text" placeholder="Buscar por nombre..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            value={filters.name__icontains}
+            onChange={handleSearchChange}
           />
           <select 
-            value={searchCategory.toString()}
-            onChange={(e) => setSearchCategory(e.target.value ? parseInt(e.target.value) : '')}
+            value={filters.category__name__exact}
+            onChange={handleCategoryChange}
           >
             <option value="">Todas las categorías</option>
             {categories.map((category) => (
@@ -268,8 +295,8 @@ export function Products() {
             ))}
           </select>
           <select
-            value={searchSupplier}
-            onChange={(e) => setSearchSupplier(e.target.value ? parseInt(e.target.value) : '')}
+            value={filters.supplier__name__exact}
+            onChange={handleSupplierChange}
           >
             <option value="">Todos los proveedores</option>
             {suppliers.map((supplier) => (
@@ -282,9 +309,7 @@ export function Products() {
       </div>
 
       {/* Modal de edición */}
-
       {isEditOpen && editingProduct && (
-
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-lg max-w-md">
             <div className="flex justify-between items-center mb-4">
@@ -312,14 +337,14 @@ export function Products() {
                 onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
               />
               <input
-                type="text"
+                type="number"
                 placeholder="Stock actual..."
                 value={editingProduct.current_stock}
                 onChange={(e) => setEditingProduct({...editingProduct, current_stock: e.target.value})}
                 required
               />
               <input
-                type="text"
+                type="number"
                 placeholder="Stock mínimo..."
                 value={editingProduct.minimum_stock}
                 onChange={(e) => setEditingProduct({...editingProduct, minimum_stock: e.target.value})}
@@ -340,6 +365,7 @@ export function Products() {
                 value={editingProduct.supplier}
                 onChange={(e) => setEditingProduct({...editingProduct, supplier: e.target.value})}
               >
+                <option value="">Selecciona un proveedor</option>
                 {suppliers.map((supplier) => (
                   <option key={supplier.id} value={supplier.id}>
                     {supplier.name}
@@ -347,7 +373,7 @@ export function Products() {
                 ))}
               </select>
               <input
-                type="text"
+                type="number"
                 placeholder="Precio del producto..."
                 value={editingProduct.price}
                 onChange={(e) => setEditingProduct({...editingProduct, price: e.target.value})}
@@ -370,20 +396,25 @@ export function Products() {
 
       <div>
         <h2>Lista de productos</h2>
-        <ul>
-          {filteredProducts.map((product) => (
-            <li 
-              key={product.id}
-              >
-              Product: {product.name} / SKU: {product.sku} / Current Stock: {product.current_stock}
-              <div>
-                <button type="button" onClick={() => handleEditProduct(product)}
-                ><Edit/></button>
-                <button type="button" onClick={() => handleDeleteProduct(product.id)}><Trash /></button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        {isLoading ? (
+          <p>Cargando...</p>
+        ) : (
+          <ul>
+            {products.map((product) => (
+              <li key={product.id}>
+                Product: {product.name} / SKU: {product.sku} / Current Stock: {product.current_stock}
+                <div>
+                  <button type="button" onClick={() => handleEditProduct(product)}>
+                    <Edit/>
+                  </button>
+                  <button type="button" onClick={() => handleDeleteProduct(product.id)}>
+                    <Trash />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
