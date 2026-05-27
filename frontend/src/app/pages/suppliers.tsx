@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, Search, Trash, X, Edit, Check} from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { loadFilteredDataFromAPI, loadDataFromAPI } from '../../services/api';
+import { loadFilteredDataFromAPI, loadDataFromAPI, postDataToAPI } from '../../services/api';
 import { ENDPOINTS } from '@/lib/utils';
 
 export function Suppliers() {
@@ -12,6 +12,16 @@ export function Suppliers() {
     contact__icontains: '',
     email__icontains: '',
   })
+  const [newSupplier, setNewSupplier] = useState({
+    name: '',
+    contact: '',
+    email: '',
+    phone: '',
+    address: '',
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingSupplierId, setEditingSupplierId] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -46,6 +56,39 @@ export function Suppliers() {
     });
   };
 
+  const handleAddSupplier = async (e) => {
+    e.preventDefault();
+
+    if (!newSupplier.name || !newSupplier.contact || !newSupplier.email) {
+      alert("Por favor llena todos los campos requeridos.");
+      return;
+    }
+
+    try {
+      // const payload = {
+      //   name: newSupplier.name,
+      //   contact: newSupplier.contact,
+      //   email: newSupplier.email,
+      //   phone: newSupplier.phone,
+      //   address: newSupplier.address,
+      // };  
+
+      await postDataToAPI(ENDPOINTS.SUPPLIERS, newSupplier);
+      setNewSupplier({
+        name: '',
+        contact: '',
+        email: '',
+        phone: '',
+        address: '',
+      });
+      // Refrescar la lista de proveedores después de agregar uno nuevo
+      await loadDataFromAPI(ENDPOINTS.SUPPLIERS, setSuppliers);
+      alert("Proveedor agregado exitosamente!");
+    } catch (error) {
+      console.error('Error adding supplier:', error);
+    }
+  }
+
   return (
     <div>
       <div>
@@ -54,10 +97,55 @@ export function Suppliers() {
           <p>Administra tus proveedores y contactos</p>
         </div>
         <div>
-          <button>
+          <button onClick={() => setIsOpen(true)}>
             <Plus />
             Nuevo Proveedor
           </button>
+          {isOpen && (
+            <div>
+              <h2>Agregar Nuevo Proveedor</h2>
+              <form onSubmit={handleAddSupplier}>
+                <input
+                  type="text"
+                  placeholder="Nombre"
+                  value={newSupplier.name}
+                  onChange={(e) => setNewSupplier({...newSupplier, name: e.target.value})}
+                />
+                <input
+                  type="text"
+                  placeholder="Contacto"
+                  value={newSupplier.contact}
+                  onChange={(e) => setNewSupplier({...newSupplier, contact: e.target.value})}
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={newSupplier.email}
+                  onChange={(e) => setNewSupplier({...newSupplier, email: e.target.value})}
+                />
+                <input
+                  type="text"
+                  placeholder="Teléfono"
+                  value={newSupplier.phone}
+                  onChange={(e) => setNewSupplier({...newSupplier, phone: e.target.value})}
+                />
+                <input
+                  type="text"
+                  placeholder="Dirección"
+                  value={newSupplier.address}
+                  onChange={(e) => setNewSupplier({...newSupplier, address: e.target.value})}
+                />
+                <button type="submit">
+                  <Check />
+                  Agregar Proveedor
+                </button>
+                <button type="button" onClick={() => setIsOpen(false)}>
+                  <X />
+                  Cancelar
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </div>
       
