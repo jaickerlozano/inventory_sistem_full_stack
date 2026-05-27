@@ -27,6 +27,8 @@ class DashboardView(APIView):
         total_in_movements = StockMovement.objects.filter(type='IN').aggregate(total_in=Sum('quantity'))['total_in'] or 0
         total_out_movements = StockMovement.objects.filter(type='OUT').aggregate(total_out=Sum('quantity'))['total_out'] or 0
 
+        total_products_category = Product.objects.values('category__name').annotate(total=Count('id')).order_by('-total')
+
         # Empaquetamos la lógica de negocio en un diccionario (JSON)
         data = {
             'total_products': total_products,
@@ -37,6 +39,7 @@ class DashboardView(APIView):
             'low_stock_products': low_stock_products,
             'total_in_movements': total_in_movements,
             'total_out_movements': total_out_movements,
+            'total_products_category': total_products_category,
         }
         return Response(data)
 
@@ -120,7 +123,21 @@ class ProductViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {
+        'name': ['icontains'], # Permite filtrar por nombre (contiene)
+        'description': ['icontains'], # Permite filtrar por descripción (contiene)
+    }
 
+    # Acción personalizada para obtener el total de productos por categoría
+    # detail = False indica que esta acción no requiere un ID específico de categoría, es una acción a nivel de colección
+    # GET /api/inventory/categories/total_products/
+    # total_products es el nombre de la acción que se usará en la URL para acceder a esta funcionalidad
+    @action(detail=False, methods=['get'])
+    def total_products(self, request):
+        categories = Category.objects.annotate(total_products=Count('products')).values('id', 'name', 'total_products', 'description')
+
+        return Response(categories)
 
 class SupplierViewSet(viewsets.ModelViewSet):
     queryset = Supplier.objects.all()
