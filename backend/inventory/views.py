@@ -134,7 +134,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     # GET /api/inventory/categories/total_products/
     # total_products es el nombre de la acción que se usará en la URL para acceder a esta funcionalidad
     @action(detail=False, methods=['get'])
-    def total_products(self, request):
+    def totalproducts(self, request):
         categories = Category.objects.annotate(total_products=Count('products')).values('id', 'name', 'total_products', 'description')
 
         return Response(categories)
