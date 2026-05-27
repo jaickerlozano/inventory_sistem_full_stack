@@ -17,9 +17,9 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Supplier)
 class SupplierAdmin(admin.ModelAdmin):
-    list_display = ('name', 'contact_person', 'contact_email', 'contact_phone', 'address')
-    search_fields = ('name', 'contact_person')
-    list_filter = ('name', 'contact_person')
+    list_display = ('name', 'contact', 'email', 'phone', 'address')
+    search_fields = ('name', 'contact')
+    list_filter = ('name', 'contact')
     ordering = ('name',)
 
 @admin.register(StockMovement)

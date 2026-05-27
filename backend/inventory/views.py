@@ -128,9 +128,9 @@ class SupplierViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = {
         'name': ['icontains'], # Permite filtrar por nombre (contiene)
-        'contact_person': ['icontains'], # Permite filtrar por persona de contacto (contiene)
-        'contact_email': ['icontains'], # Permite filtrar por email de contacto (contiene)
-        'contact_phone': ['icontains'], # Permite filtrar por teléfono de contacto (contiene)
+        'contact': ['icontains'], # Permite filtrar por persona de contacto (contiene)
+        'email': ['icontains'], # Permite filtrar por email de contacto (contiene)
+        'phone': ['icontains'], # Permite filtrar por teléfono de contacto (contiene)
     }
 
 
