@@ -20,37 +20,52 @@ export function Categories() {
   const [totalProducts, setTotalProducts] = useState([]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      setIsLoading(true);
-      try {
-        const activeFilters = Object.fromEntries(
-          Object.entries(filters).filter(([_, value]) => value)
-        );
-
-        if (Object.keys(activeFilters).length > 0) {
-          await loadFilteredDataFromAPI(ENDPOINTS.CATEGORIES, activeFilters, setCategories);
-        } else {
-          await Promise.all([
-            loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories),
-            loadDataFromAPI(ENDPOINTS.TOTAL_PRODUCTS, setTotalProducts),
-          ]);
+    // Se agrega un pequeño delay para evitar hacer demasiadas llamadas a la API mientras el usuario escribe en el campo de búsqueda
+    const timer = setTimeout(() => {
+      const fetchCategories = async () => {
+        setIsLoading(true);
+        try {
+          const activeFilters = Object.fromEntries(
+            Object.entries(filters).filter(([_, value]) => value)
+          );
+  
+          if (Object.keys(activeFilters).length > 0) {
+            await loadFilteredDataFromAPI(ENDPOINTS.CATEGORIES, activeFilters, setCategories);
+          } else {
+            await Promise.all([
+              loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories),
+              loadDataFromAPI(ENDPOINTS.TOTAL_PRODUCTS, setTotalProducts),
+            ]);
+          }
+        } catch (error) {
+          console.error("Error al cargar las categorías:", error);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Error al cargar las categorías:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCategories();      
-  }, []);
+      };
+      fetchCategories();      
+    }, 300);
 
-  // Nuevo useEffect que se ejecuta cuando categories cambia
+    return () => clearTimeout(timer);
+  }, [filters]);
+  
+  // Nuevo useEffect que se ejecuta cuando categories cambia. Temporalmente para debuggear la carga de categorías y totalProducts
   useEffect(() => {
     if (categories.length > 0) {
       console.log("Categorías cargadas:", categories);
       console.log("Total de productos por categoría:", totalProducts);
+      console.log('filtros actuales:', filters);
     }
   }, [categories]);
+
+  const handleSearchChange = (e) => {
+    setFilters({
+      ...filters,
+      name__icontains: e.target.value, 
+      description__icontains: e.target.value,
+    });
+    console.log(filters)
+  };
 
   return (
     <div>
@@ -97,9 +112,11 @@ export function Categories() {
           <h3>Buscar Categoría</h3>
           <div> 
             <Search />
-            <input type="text" placeholder="Buscar por nombre o descripción..." 
+            <input 
+              type="text" 
+              placeholder="Buscar por nombre o descripción..." 
               value={filters.name__icontains}
-              onChange={(e) => setFilters({...filters, name__icontains: e.target.value})}
+              onChange={handleSearchChange}
             />
           </div>
         </div>
