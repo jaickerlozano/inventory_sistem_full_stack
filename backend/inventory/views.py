@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from django.db.models import Count, F, Sum
+from django.db.models import Count, F, Sum, Q
 from rest_framework.decorators import action
 from .serializer import ProductSerializer, CategorySerializer, SupplierSerializer, StockMovementSerializer
 from .models import Product, Category, Supplier, StockMovement
@@ -124,11 +124,22 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = {
-        'name': ['icontains'], # Permite filtrar por nombre (contiene)
-        'description': ['icontains'], # Permite filtrar por descripción (contiene)
-    }
 
+    # Sobrescribimos el método get_queryset para permitir búsqueda por nombre o descripción usando un parámetro 'search' en la URL
+    def get_queryset(self):
+        queryset = Category.objects.all()
+        
+        # Se captura el parámetro de búsqueda 'search' desde la URL
+        # search es un término de búsqueda general que se usará para filtrar tanto por nombre como por descripción que viene del frontend
+        search_query = self.request.query_params.get('search', None)
+
+        if search_query:
+            # Si se proporciona un término de búsqueda, se filtran las categorías por nombre o descripción que contengan el término
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) | Q(description__icontains=search_query)
+            )
+        return queryset
+    
     # Acción personalizada para obtener el total de productos por categoría
     # detail = False indica que esta acción no requiere un ID específico de categoría, es una acción a nivel de colección
     # GET /api/inventory/categories/total_products/
