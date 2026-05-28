@@ -171,6 +171,12 @@ from .models import Product, StockMovement
 class StockMovementViewSet(viewsets.ModelViewSet):
     queryset = StockMovement.objects.all()
     serializer_class = StockMovementSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {
+        'product': ['icontains'], # Permite filtrar por nombre del producto (contiene)
+        'type': ['exact'],
+        'quantity': ['exact']
+    }
 
     # Sobrescribimos el método create para manejar la lógica de actualización de stock
     def create(self, request, *args, **kwargs):
