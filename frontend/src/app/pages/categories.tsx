@@ -7,8 +7,7 @@ export function Categories() {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
-    name__icontains: '',
-    description__icontains: '',
+    search: '', // Campo de búsqueda general que se envía a la API para filtrar por nombre o descripción
   });
   const [newCategory, setNewCategory] = useState({
     name: '',
@@ -61,8 +60,7 @@ export function Categories() {
   const handleSearchChange = (e) => {
     setFilters({
       ...filters,
-      name__icontains: e.target.value, 
-      description__icontains: e.target.value,
+      search: e.target.value, // Se agrega un campo de búsqueda general que se envía a la API
     });
     console.log(filters)
   };
@@ -115,7 +113,7 @@ export function Categories() {
             <input 
               type="text" 
               placeholder="Buscar por nombre o descripción..." 
-              value={filters.name__icontains}
+              value={filters.search}
               onChange={handleSearchChange}
             />
           </div>
