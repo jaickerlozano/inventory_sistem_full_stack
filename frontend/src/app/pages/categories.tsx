@@ -65,6 +65,28 @@ export function Categories() {
     console.log(filters)
   };
 
+  const handleAddCategory = async (e) => {
+    e.preventDefault();
+    
+    if (!newCategory.name) {
+      alert("El nombre de la categoría es obligatorio.");
+      return;
+    }
+
+    try {
+      await postDataToAPI(ENDPOINTS.CATEGORIES, newCategory);
+      setNewCategory({
+        name: '',
+        description: '',
+      });
+      // Después de agregar una nueva categoría, recargamos la lista para mostrar la nueva categoría
+      await loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories);
+      alert("Categoría agregada exitosamente!");
+    } catch (error) {
+      console.error('Error al agregar categoría:', error);
+    }
+  }
+
   return (
     <div>
       <div>
@@ -82,7 +104,7 @@ export function Categories() {
           { isOpen && (
             <div>
               <h2>Nueva Categoría</h2>
-              <form>
+              <form onSubmit={handleAddCategory}>
                 <input
                   type="text"
                   placeholder="Nombre"
@@ -98,6 +120,10 @@ export function Categories() {
                 <button type="submit">
                   <Check />
                   Guardar
+                </button>
+                <button type="button" onClick={() => setIsOpen(false)}>
+                  <X />
+                  Cancelar
                 </button>
               </form>
             </div>
