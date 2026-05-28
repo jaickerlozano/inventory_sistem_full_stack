@@ -173,7 +173,7 @@ class StockMovementViewSet(viewsets.ModelViewSet):
     serializer_class = StockMovementSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = {
-        'product': ['icontains'], # Permite filtrar por nombre del producto (contiene)
+        'product': ['exact'], # Permite filtrar por nombre del producto (contiene)
         'type': ['exact'],
         'quantity': ['exact']
     }
