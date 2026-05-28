@@ -200,64 +200,15 @@ export function Suppliers() {
         </div>
       </div>
 
-      { isEditing && editingSupplier && (
-        <div>
-          <h2>Editar Proveedor</h2>
-          <form onSubmit={handleSaveEditSupplier}>
-            <input
-              type="text"
-              placeholder="Nombre"
-              value={editingSupplier.name}
-              onChange={(e) => setEditingSupplier({...editingSupplier, name: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="Contacto"
-              value={editingSupplier.contact}
-              onChange={(e) => setEditingSupplier({...editingSupplier, contact: e.target.value})}
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={editingSupplier.email}
-              onChange={(e) => setEditingSupplier({...editingSupplier, email: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="Teléfono"
-              value={editingSupplier.phone}
-              onChange={(e) => setEditingSupplier({...editingSupplier, phone: e.target.value})}
-            />
-            <input
-              type="text"
-              placeholder="Dirección"
-              value={editingSupplier.address}
-              onChange={(e) => setEditingSupplier({...editingSupplier, address: e.target.value})}
-            />
-            <button type="submit">
-              <Check />
-              Guardar Cambios
-            </button>
-            <button type="button" onClick={() => {
-              setIsEditing(false);
-            }}>
-              <X />
-              Cancelar
-            </button>
-          </form>
-        </div>
-      )}
-
       <div>
-        {isLoading ? (
-          <p>Cargando proveedores...</p>
-        ) : suppliers.length > 0 ? (
-          suppliers.map((supplier) => (
-            <div key={supplier.id}>
+      {isLoading ? (
+        <p>Cargando proveedores...</p>
+      ) : suppliers.length > 0 ? (
+        suppliers.map((supplier) => (
+          <div key={supplier.id}>
+            <div>
               <h3>{supplier.name}</h3>
               <p>Contacto: {supplier.contact}</p>
-              <p>Email: {supplier.contact_email}</p>
-              <p>Teléfono: {supplier.contact_phone}</p>
 
               <button onClick={() => handleEditSupplier(supplier)}>
                 <Edit />
@@ -269,11 +220,91 @@ export function Suppliers() {
                 Eliminar
               </button>
             </div>
+            <div>
+              <p>Email: {supplier.contact_email}</p>
+              <p>Teléfono: {supplier.contact_phone}</p>
+              <p>Dirección: {supplier.address}</p>
+            </div>
+            {isEditing && editingSupplier && editingSupplier.id === supplier.id && (
+              <div>
+                <h2>Editar Proveedor</h2>
+                <form onSubmit={handleSaveEditSupplier}>
+                  <input
+                    type="text"
+                    placeholder="Nombre"
+                    value={editingSupplier.name}
+                    onChange={(e) =>
+                      setEditingSupplier({
+                        ...editingSupplier,
+                        name: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Contacto"
+                    value={editingSupplier.contact}
+                    onChange={(e) =>
+                      setEditingSupplier({
+                        ...editingSupplier,
+                        contact: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={editingSupplier.contact_email}
+                    onChange={(e) =>
+                      setEditingSupplier({
+                        ...editingSupplier,
+                        contact_email: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Teléfono"
+                    value={editingSupplier.contact_phone}
+                    onChange={(e) =>
+                      setEditingSupplier({
+                        ...editingSupplier,
+                        contact_phone: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="text"
+                    placeholder="Dirección"
+                    value={editingSupplier.address}
+                    onChange={(e) =>
+                      setEditingSupplier({
+                        ...editingSupplier,
+                        address: e.target.value,
+                      })
+                    }
+                  />
+                  <button type="submit">
+                    <Check />
+                    Guardar Cambios
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                  >
+                    <X />
+                    Cancelar
+                  </button>
+                </form>
+              </div>    
+            )} 
+          </div>
           ))
         ) : (
           <p>No hay proveedores</p>
         )}
       </div>
+
 
     </div>
   );
