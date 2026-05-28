@@ -114,6 +114,20 @@ export function Categories() {
     }
   };
   
+  const handleDeleteCategory = async (categoryId) => {
+    if (!window.confirm("¿Estás seguro de que quieres eliminar esta categoría?")) {
+      return;
+    }
+
+    try {
+      await deleteDataFromAPI(`${ENDPOINTS.CATEGORIES}/${categoryId}`);
+      // Refrescar la lista de categorías después de eliminar una
+      await loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories);
+      alert("Categoría eliminada exitosamente!");
+    } catch (error) {
+      console.error('Error al eliminar categoría:', error);
+    }
+  };  
   
   return (
     <div>
@@ -196,13 +210,7 @@ export function Categories() {
                         <Edit />
                         Editar
                       </button>
-                      <button onClick={() => {
-                        if (window.confirm("¿Estás seguro de eliminar esta categoría?")) {
-                          deleteDataFromAPI(ENDPOINTS.CATEGORIES, category.id, () => {
-                            setCategories(categories.filter(c => c.id !== category.id));
-                          });
-                        }
-                      }}>
+                      <button onClick={() => handleDeleteCategory(category.id)}>
                         <Trash />
                         Eliminar
                       </button>
