@@ -17,6 +17,7 @@ export function Categories() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [totalProducts, setTotalProducts] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -29,7 +30,10 @@ export function Categories() {
         if (Object.keys(activeFilters).length > 0) {
           await loadFilteredDataFromAPI(ENDPOINTS.CATEGORIES, activeFilters, setCategories);
         } else {
-          await loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories);
+          await Promise.all([
+            loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories),
+            loadDataFromAPI(ENDPOINTS.TOTAL_PRODUCTS, setTotalProducts),
+          ]);
         }
       } catch (error) {
         console.error("Error al cargar las categorías:", error);
@@ -44,6 +48,7 @@ export function Categories() {
   useEffect(() => {
     if (categories.length > 0) {
       console.log("Categorías cargadas:", categories);
+      console.log("Total de productos por categoría:", totalProducts);
     }
   }, [categories]);
 
@@ -111,8 +116,8 @@ export function Categories() {
                       <Package /> 
                     </div>
                     <div>
-                      <h4>{category.name} ({category.total_products})</h4>
-                      <p>{category.description}</p> 
+                      <h4>{category.name}</h4>
+                      <p>{totalProducts.find((tp) => tp.id === category.id)?.total_products || 0} productos</p>
                     </div>
                     <div>
                       <button onClick={() => {
