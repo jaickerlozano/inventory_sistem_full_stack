@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { ENDPOINTS } from "@/lib/utils";
 import { loadDataFromAPI, loadFilteredDataFromAPI, postDataToAPI, putDataToFromAPI, deleteDataFromAPI} from "../../services/api";
-import { Plus, Search, Trash, X, Edit, Check, Badge, Package } from "lucide-react";
+import { Plus, Search, Trash, X, Edit, Check, Badge, Package, Calendar } from "lucide-react";
 
 export function StockMovements() {
   const [movements, setMovements] = useState([]);
+  const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
     product: '', // Campo de búsqueda general que se envía a la API para filtrar por nombre o descripción
     type: '', // Campo para filtrar por tipo de movimiento (entrada/salida)
-    quntity: '',
   });
   const [newMovement, setNewMovement] = useState({
     product: '',
@@ -32,7 +32,10 @@ export function StockMovements() {
           if (Object.keys(activeFilters).length > 0) {
             await loadFilteredDataFromAPI(ENDPOINTS.STOCK_MOVEMENTS, activeFilters, setMovements);
           } else {
-            await loadDataFromAPI(ENDPOINTS.STOCK_MOVEMENTS, setMovements)
+            await Promise.all([
+              loadDataFromAPI(ENDPOINTS.STOCK_MOVEMENTS, setMovements),
+              loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts),
+            ]);            
           }
         } catch (error) {
           console.error("Error al cargar los movimientos de stock:", error);
@@ -67,7 +70,7 @@ export function StockMovements() {
             type="text"
             placeholder="Buscar por producto o descripción..."
             value={filters.product}
-            onChange={(e) => setFilters({ ...filters, product: e.target.value })}
+            onChange={(e) => setFilters({...filters, product: e.target.value })}
           />
           <Search />
         </div>
@@ -82,7 +85,7 @@ export function StockMovements() {
             movements.map((movement) => (
               <div key={movement.id}>
                 <div>
-                  <Badge /> {movement.product_name} - {movement.type === 'entry' ? 'Entrada' : 'Salida'} - Cantidad: {movement.quantity}
+                  <Calendar /> { new Date(movement.timestamp).toLocaleDateString() } - {products.find((p) => p.id === movement.product)?.name || 'Producto no encontrado'} - {movement.type === 'IN' ? 'Entrada' : 'Salida'} - Cantidad: {movement.type === 'IN' ? '+' : '-'} {movement.quantity}
                 </div>
                 <div>
                   <Edit /> Editar
