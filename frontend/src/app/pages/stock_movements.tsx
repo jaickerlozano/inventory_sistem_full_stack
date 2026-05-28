@@ -57,9 +57,52 @@ export function StockMovements() {
           <p>Registra y consulta todas las entradas y salidas</p>
         </div>
         <div>
-          <button>
+          <button onClick={() => setIsOpen(true)}>
             <Plus /> Registrar Movimiento
           </button>
+
+          { isOpen && (
+            <div>
+              <div>
+                <div>
+                  <h2>{isEditing ? 'Editar Movimiento' : 'Registrar Nuevo Movimiento'}</h2>
+                  <p>Registra una entrada o salida de productos en el inventario</p>
+                </div>
+                <button onClick={() => setIsOpen(false)}>
+                  <X />
+                </button>
+              </div>
+              <form>
+                <div> 
+                  <label>Producto</label>
+                  <select value={newMovement.product} onChange={(e) => setNewMovement({...newMovement, product: e.target.value })}>
+                    <option value="">Selecciona un producto</option>
+                    {products.map((product) => (
+                      <option key={product.id} value={product.id}>{product.name}</option>
+                    ))}
+                  </select> 
+                </div>
+                <div>
+                  <label>Tipo de Movimiento</label>
+                  <select value={newMovement.type} onChange={(e) => setNewMovement({...newMovement, type: e.target.value })}>
+                    <option value="entry">Entrada</option>
+                    <option value="exit">Salida</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Cantidad</label>
+                  <input type="number" value={newMovement.quantity} onChange={(e) => setNewMovement({...newMovement, quantity: parseInt(e.target.value) })} />
+                </div>
+                <button
+                  type="button" onClick={() => setIsOpen(false)} className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 ml-2">
+                  Cancelar
+                </button>
+                <button type="submit">
+                  <Check /> {isEditing ? 'Guardar Cambios' : 'Registrar Movimiento'}
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </div>
 
