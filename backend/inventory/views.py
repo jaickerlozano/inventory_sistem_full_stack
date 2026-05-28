@@ -175,7 +175,8 @@ class StockMovementViewSet(viewsets.ModelViewSet):
     filterset_fields = {
         'product': ['exact'], # Permite filtrar por nombre del producto (contiene)
         'type': ['exact'],
-        'quantity': ['exact']
+        'quantity': ['lt', 'gt', 'exact'], # Permite filtrar por cantidad (menor que, mayor que, igual a)
+        'timestamp': ['lt', 'gt', 'exact'], # Permite filtrar por fecha de movimiento (menor que, mayor que, igual a)
     }
 
     # Sobrescribimos el método create para manejar la lógica de actualización de stock
