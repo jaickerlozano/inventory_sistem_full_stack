@@ -13,9 +13,10 @@ export function StockMovements() {
   });
   const [newMovement, setNewMovement] = useState({
     product: '',
-    type: 'entry',
+    type: '',
     quantity: 0,
   });
+
   const [isEditing, setIsEditing] = useState(false);
   const [editingMovement, setEditingMovement] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -28,14 +29,14 @@ export function StockMovements() {
           const activeFilters = Object.fromEntries(
             Object.entries(filters).filter(([_, value]) => value)
           );
-  
+
+          // Cargar productos para mostrar el nombre en lugar del ID en la lista de movimientos
+          await loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts);
+
           if (Object.keys(activeFilters).length > 0) {
             await loadFilteredDataFromAPI(ENDPOINTS.STOCK_MOVEMENTS, activeFilters, setMovements);
           } else {
-            await Promise.all([
-              loadDataFromAPI(ENDPOINTS.STOCK_MOVEMENTS, setMovements),
-              loadDataFromAPI(ENDPOINTS.PRODUCTS, setProducts),
-            ]);            
+            await loadDataFromAPI(ENDPOINTS.STOCK_MOVEMENTS, setMovements);         
           }
         } catch (error) {
           console.error("Error al cargar los movimientos de stock:", error);
@@ -48,6 +49,30 @@ export function StockMovements() {
 
     return () => clearTimeout(timer);
   }, [filters]);
+
+  const handleAddMovement = async (e) => {
+    e.preventDefault();
+
+    if (!newMovement.product || !newMovement.type || newMovement.quantity <= 0) {
+      alert('Por favor completa todos los campos correctamente');
+      return;
+    }
+    
+    try {
+      await postDataToAPI(ENDPOINTS.STOCK_MOVEMENTS, newMovement);
+      setNewMovement({
+        product: '',
+        type: '',
+        quantity: 0,
+      });
+      setIsOpen(false);
+      // Recargar movimientos después de agregar uno nuevo
+      await loadDataFromAPI(ENDPOINTS.STOCK_MOVEMENTS, setMovements);
+      alert('Movimiento de stock registrado exitosamente');
+    } catch (error) {
+      console.error("Error al registrar el movimiento de stock:", error);
+    }
+  }
 
   return (
     <div>
@@ -72,10 +97,12 @@ export function StockMovements() {
                   <X />
                 </button>
               </div>
-              <form>
+              <form onSubmit={handleAddMovement}>
                 <div> 
                   <label>Producto</label>
-                  <select value={newMovement.product} onChange={(e) => setNewMovement({...newMovement, product: e.target.value })}>
+                  <select 
+                    value={newMovement.product} 
+                    onChange={(e) => setNewMovement({...newMovement, product: e.target.value })}>
                     <option value="">Selecciona un producto</option>
                     {products.map((product) => (
                       <option key={product.id} value={product.id}>{product.name}</option>
@@ -84,14 +111,20 @@ export function StockMovements() {
                 </div>
                 <div>
                   <label>Tipo de Movimiento</label>
-                  <select value={newMovement.type} onChange={(e) => setNewMovement({...newMovement, type: e.target.value })}>
-                    <option value="entry">Entrada</option>
-                    <option value="exit">Salida</option>
+                  <select 
+                    value={newMovement.type} 
+                    onChange={(e) => setNewMovement({...newMovement, type: e.target.value })}>
+                    <option value="">Selecciona un tipo de movimiento</option>
+                    <option value="IN">Entrada</option>
+                    <option value="OUT">Salida</option>
                   </select>
                 </div>
                 <div>
                   <label>Cantidad</label>
-                  <input type="number" value={newMovement.quantity} onChange={(e) => setNewMovement({...newMovement, quantity: parseInt(e.target.value) })} />
+                  <input 
+                    type="number" 
+                    value={newMovement.quantity} 
+                    onChange={(e) => setNewMovement({...newMovement, quantity: parseInt(e.target.value) })} />
                 </div>
                 <button
                   type="button" onClick={() => setIsOpen(false)} className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 ml-2">
