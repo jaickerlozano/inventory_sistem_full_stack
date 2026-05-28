@@ -87,6 +87,34 @@ export function Categories() {
     }
   }
 
+  const handleEditCategory = (category) => {
+    setIsEditing(true);
+    setEditingCategory(category);
+  };
+
+  const handleSaveEditCategory = async (e) => {
+    e.preventDefault();
+
+    if (!editingCategory.name || !editingCategory.description) {
+      alert("Por favor llena todos los campos requeridos.");
+      return;
+    }
+
+    try {
+      await putDataToFromAPI(`${ENDPOINTS.CATEGORIES}/${editingCategory.id}`, {
+        name: editingCategory.name,
+        description: editingCategory.description,
+      });
+      setEditingCategory(null);
+      // Refrescar la lista de categorías después de editar una
+      await loadDataFromAPI(ENDPOINTS.CATEGORIES, setCategories);
+      alert("Categoría actualizada exitosamente!");
+    } catch (error) {
+      console.error('Error al actualizar categoría:', error);
+    }
+  };
+  
+  
   return (
     <div>
       <div>
@@ -184,7 +212,7 @@ export function Categories() {
                   {isEditing && editingCategory && editingCategory.id === category.id && (
                     <div>
                       <h2>Editar Categoría</h2>
-                      <form>
+                      <form onSubmit={handleSaveEditCategory}>
                         <input
                           type="text"
                           placeholder="Nombre"
