@@ -85,7 +85,6 @@ export function StockMovements() {
           <button onClick={() => setIsOpen(true)}>
             <Plus /> Registrar Movimiento
           </button>
-
           { isOpen && (
             <div>
               <div>
