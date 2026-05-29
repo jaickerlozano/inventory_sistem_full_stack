@@ -49,14 +49,14 @@ class AlertsView(APIView):
         # Alertas para productos con stock bajo (current_stock < minimum_stock)
         low_stock_products = Product.objects.filter(current_stock__lt=F('minimum_stock')).values('id', 'name', 'current_stock', 'minimum_stock')
 
-        # Alertas para productos con niveles medios para reposición de stock (current_stock <= minimum_stock y current_stock > minimum_stock * 0.6)
-        medium_stock_products = Product.objects.filter(current_stock__lte=F('minimum_stock'), current_stock__gt=F('minimum_stock') * 0.6).values('id', 'name', 'current_stock', 'minimum_stock', 'category__name')
+        # Alertas para productos con niveles medios para reposición de stock (current_stock >= minimum_stock y current_stock < minimum_stock * 2)
+        medium_stock_products = Product.objects.filter(current_stock__gte=F('minimum_stock'), current_stock__lt=F('minimum_stock') * 2).values('id', 'name', 'current_stock', 'minimum_stock', 'category__name')
 
-        # Alertas para productos con niveles altos para reposición de stock (current_stock <= minimum_stock * 0.6 y current_stock > minimum_stock * 0.3)
-        high_stock_products = Product.objects.filter(current_stock__lte=F('minimum_stock') * 0.6, current_stock__gt=F('minimum_stock') * 0.3).values('id', 'name', 'current_stock', 'minimum_stock', 'category__name')
+        # Alertas para productos con niveles altos para reposición de stock (current_stock <= minimum_stock y current_stock > minimum_stock * 0.6)
+        high_stock_products = Product.objects.filter(current_stock__lte=F('minimum_stock'), current_stock__gt=F('minimum_stock') * 0.6).values('id', 'name', 'current_stock', 'minimum_stock', 'category__name')
 
-        # Alertas para productos con niveles de stock crítico para reposición (current_stock <= minimum_stock * 0.3 y current_stock > minimum_stock * 0.1)
-        critical_stock_products = Product.objects.filter(current_stock__lte=F('minimum_stock') * 0.3, current_stock__gt=F('minimum_stock') * 0.1).values('id', 'name', 'current_stock', 'minimum_stock', 'category__name')
+        # Alertas para productos con niveles de stock crítico para reposición (current_stock <= minimum_stock * 0.6 y current_stock > minimum_stock * 0.3)
+        critical_stock_products = Product.objects.filter(current_stock__lte=F('minimum_stock') * 0.6, current_stock__gt=F('minimum_stock') * 0.3).values('id', 'name', 'current_stock', 'minimum_stock', 'category__name')
 
         data = {
             'low_stock_products': low_stock_products,
