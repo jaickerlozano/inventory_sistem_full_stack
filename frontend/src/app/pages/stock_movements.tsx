@@ -85,7 +85,6 @@ export function StockMovements() {
           <button onClick={() => setIsOpen(true)}>
             <Plus /> Registrar Movimiento
           </button>
-
           { isOpen && (
             <div>
               <div>
@@ -162,10 +161,6 @@ export function StockMovements() {
               <div key={movement.id}>
                 <div>
                   <Calendar /> { new Date(movement.timestamp).toLocaleDateString() } - {products.find((p) => p.id === movement.product)?.name || 'Producto no encontrado'} - {movement.type === 'IN' ? 'Entrada' : 'Salida'} - Cantidad: {movement.type === 'IN' ? '+' : '-'} {movement.quantity}
-                </div>
-                <div>
-                  <Edit /> Editar
-                  <Trash /> Eliminar
                 </div>
               </div>
             ))

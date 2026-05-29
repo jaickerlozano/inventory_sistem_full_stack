@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from django.db.models import Count, F, Sum, Q
+from django.db.models import Count, F, Sum, Q, Case, When, Value, CharField
 from rest_framework.decorators import action
 from .serializer import ProductSerializer, CategorySerializer, SupplierSerializer, StockMovementSerializer
 from .models import Product, Category, Supplier, StockMovement
@@ -29,6 +29,8 @@ class DashboardView(APIView):
 
         total_products_category = Product.objects.values('category__name').annotate(total=Count('id')).order_by('-total')
 
+        
+
         # Empaquetamos la lógica de negocio en un diccionario (JSON)
         data = {
             'total_products': total_products,
@@ -42,28 +44,58 @@ class DashboardView(APIView):
             'total_products_category': total_products_category,
         }
         return Response(data)
-    
+
 
 class AlertsView(APIView):
     def get(self, request, format=None):
-        # Alertas para productos con stock bajo (current_stock < minimum_stock)
-        low_stock_products = Product.objects.filter(current_stock__lt=F('minimum_stock')).values('id', 'name', 'current_stock', 'minimum_stock')
+        # Anotar el nivel de alerta en cada producto basado en stock actual
+        products_with_alert = Product.objects.annotate(
+            alert_level=Case(
+                When(current_stock__lte=F('minimum_stock') * 0.3, then=Value('CRITICAL')),
+                When(current_stock__lte=F('minimum_stock') * 0.6, then=Value('HIGH')),
+                When(current_stock__lt=F('minimum_stock'), then=Value('LOW')),
+                default=Value('REGULAR'),
+                output_field=CharField(),
+            )
+        ).select_related('category', 'supplier')
 
-        # Alertas para productos con niveles medios para reposición de stock (current_stock <= minimum_stock y current_stock > minimum_stock * 0.6)
-        medium_stock_products = Product.objects.filter(current_stock__lte=F('minimum_stock'), current_stock__gt=F('minimum_stock') * 0.6).values('id', 'name', 'current_stock', 'minimum_stock', 'category__name')
+        # --- Filtros opcionales desde query params ---
+        alert_filter = request.query_params.get('alert', None)
+        category_filter = request.query_params.get('category', None)
 
-        # Alertas para productos con niveles altos para reposición de stock (current_stock <= minimum_stock * 0.6 y current_stock > minimum_stock * 0.3)
-        high_stock_products = Product.objects.filter(current_stock__lte=F('minimum_stock') * 0.6, current_stock__gt=F('minimum_stock') * 0.3).values('id', 'name', 'current_stock', 'minimum_stock', 'category__name')
+        if alert_filter:
+            products_with_alert = products_with_alert.filter(alert_level=alert_filter)
+        if category_filter:
+            products_with_alert = products_with_alert.filter(category_id=category_filter)
 
-        # Alertas para productos con niveles de stock crítico para reposición (current_stock <= minimum_stock * 0.3 y current_stock > minimum_stock * 0.1)
-        critical_stock_products = Product.objects.filter(current_stock__lte=F('minimum_stock') * 0.3, current_stock__gt=F('minimum_stock') * 0.1).values('id', 'name', 'current_stock', 'minimum_stock', 'category__name')
+        # Conteos (sobre el queryset YA filtrado)
+        critical_products = products_with_alert.filter(alert_level='CRITICAL')
+        high_products = products_with_alert.filter(alert_level='HIGH')
+        low_products = products_with_alert.filter(alert_level='LOW')
+
+        # Todos los productos con alerta (excluyendo REGULAR)
+        products_with_alerts = products_with_alert.exclude(alert_level='REGULAR')
 
         data = {
-            'low_stock_products': low_stock_products,
-            'critical_stock_products': critical_stock_products,
-            'medium_stock_products': medium_stock_products,
-            'high_stock_products': high_stock_products,
-            'critical_stock_products': critical_stock_products,
+            'critical_stock_products': list(critical_products.values(
+                'id', 'name', 'sku', 'current_stock', 'minimum_stock',
+                'alert_level', 'category__name', 'supplier__name'
+            )),
+            'high_stock_products': list(high_products.values(
+                'id', 'name', 'sku', 'current_stock', 'minimum_stock',
+                'alert_level', 'category__name', 'supplier__name'
+            )),
+            'low_stock_products': list(low_products.values(
+                'id', 'name', 'sku', 'current_stock', 'minimum_stock',
+                'alert_level', 'category__name', 'supplier__name'
+            )),
+            'products_with_alerts': list(products_with_alerts.values(
+                'id', 'name', 'sku', 'current_stock', 'minimum_stock',
+                'alert_level', 'category__name', 'supplier__name'
+            )),
+            'total_critical_stock_products': critical_products.count(),
+            'total_high_stock_products': high_products.count(),
+            'total_low_stock_products': low_products.count(),
         }
         return Response(data)
 
@@ -202,6 +234,23 @@ class StockMovementViewSet(viewsets.ModelViewSet):
         'quantity': ['lt', 'gt', 'exact'], # Permite filtrar por cantidad (menor que, mayor que, igual a)
         'timestamp': ['lt', 'gt', 'exact'], # Permite filtrar por fecha de movimiento (menor que, mayor que, igual a)
     }
+
+    # Filtrado opcional
+    def get_queryset(self):
+        queryset = StockMovement.objects.all()
+        
+        # Anotar con el nivel de alerta basado en el producto
+        queryset = queryset.annotate(
+            alert=Case(
+                When(product__current_stock__lte=F('product__minimum_stock') * 0.3, then=Value('CRITICAL')),
+                When(product__current_stock__lte=F('product__minimum_stock') * 0.6, then=Value('HIGH')),
+                When(product__current_stock__lt=F('product__minimum_stock'), then=Value('LOW')),
+                default=Value('REGULAR'),
+                output_field=CharField(),
+            )
+        )
+        
+        return queryset
 
     # Sobrescribimos el método create para manejar la lógica de actualización de stock
     def create(self, request, *args, **kwargs):

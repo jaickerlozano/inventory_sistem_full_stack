@@ -19,6 +19,8 @@ class SupplierSerializer(serializers.ModelSerializer):
 
 
 class StockMovementSerializer(serializers.ModelSerializer):
+    alert = serializers.CharField(read_only=True) # Necesario para agregar el campo temporarl
+
     class Meta:
         model = StockMovement
-        fields = '__all__'
+        fields = ['id', 'product', 'type', 'quantity', 'timestamp', 'alert']
