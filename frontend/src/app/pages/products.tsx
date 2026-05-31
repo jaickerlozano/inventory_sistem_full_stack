@@ -762,7 +762,7 @@ export function Products() {
                       / mín. {product.minimum_stock}
                     </span>
                   </div>
-                  {product.current_stock <= product.minimum_stock && (
+                  {product.current_stock < product.minimum_stock && (
                     <p className="text-xs text-destructive mt-1">
                       ⚠ Stock por debajo del mínimo
                     </p>

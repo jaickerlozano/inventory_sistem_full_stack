@@ -18,5 +18,5 @@ export const ENDPOINTS = {
   DASHBOARD: 'dashboard',
   ALERTS: 'alerts',
   TOTAL_PRODUCTS: 'products',
-  LOW_STOCK_PRODUCTS: 'alerts',
+  LOW_STOCK_PRODUCTS: 'products/lowstockproducts',
 } as const;
