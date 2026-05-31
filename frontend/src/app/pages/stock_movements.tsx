@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { ENDPOINTS } from "@/lib/utils";
-import { loadDataFromAPI, loadFilteredDataFromAPI, postDataToAPI, putDataToFromAPI, deleteDataFromAPI} from "../../services/api";
-import { Plus, Search, Trash, X, Edit, Check, Badge, Package, Calendar } from "lucide-react";
+import { loadDataFromAPI, loadFilteredDataFromAPI, postDataToAPI } from "../../services/api";
+import { Plus, Search, X, Check, Calendar } from "lucide-react";
+import type { StockMovement, Product } from '@/types';
 
 export function StockMovements() {
-  const [movements, setMovements] = useState([]);
-  const [products, setProducts] = useState([]);
+  const [movements, setMovements] = useState<StockMovement[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
     product: '', // Campo de búsqueda general que se envía a la API para filtrar por nombre o descripción
@@ -17,8 +19,6 @@ export function StockMovements() {
     quantity: 0,
   });
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingMovement, setEditingMovement] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export function StockMovements() {
     return () => clearTimeout(timer);
   }, [filters]);
 
-  const handleAddMovement = async (e) => {
+  const handleAddMovement = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!newMovement.product || !newMovement.type || newMovement.quantity <= 0) {
@@ -89,7 +89,7 @@ export function StockMovements() {
             <div>
               <div>
                 <div>
-                  <h2>{isEditing ? 'Editar Movimiento' : 'Registrar Nuevo Movimiento'}</h2>
+                  <h2>{'Registrar Nuevo Movimiento'}</h2>
                   <p>Registra una entrada o salida de productos en el inventario</p>
                 </div>
                 <button onClick={() => setIsOpen(false)}>
@@ -130,7 +130,7 @@ export function StockMovements() {
                   Cancelar
                 </button>
                 <button type="submit">
-                  <Check /> {isEditing ? 'Guardar Cambios' : 'Registrar Movimiento'}
+                  <Check /> Registrar Movimiento
                 </button>
               </form>
             </div>

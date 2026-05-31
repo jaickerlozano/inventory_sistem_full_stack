@@ -1,11 +1,12 @@
-import React from 'react';
-import { Plus, Search, Trash, X, Edit, Check} from 'lucide-react';
 import { useState, useEffect } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
+import { Plus, Search, Trash, X, Edit, Check} from 'lucide-react';
 import { loadFilteredDataFromAPI, loadDataFromAPI, postDataToAPI, putDataToFromAPI, deleteDataFromAPI} from '../../services/api';
 import { ENDPOINTS } from '@/lib/utils';
+import type { Supplier } from '@/types';
 
 export function Suppliers() {
-  const [suppliers, setSuppliers] = useState([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
     name__icontains: '',
@@ -20,7 +21,7 @@ export function Suppliers() {
     address: '',
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [editingSupplier, setEditingSupplier] = useState(null);
+  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -49,14 +50,14 @@ export function Suppliers() {
     fetchSuppliers();
   }, [filters]);
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFilters({
       ...filters,
       name__icontains: e.target.value, 
     });
   };
 
-  const handleAddSupplier = async (e) => {
+  const handleAddSupplier = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!newSupplier.name || !newSupplier.contact || !newSupplier.email) {
@@ -81,13 +82,15 @@ export function Suppliers() {
     }
   }
 
-  const handleEditSupplier = (supplier) => {
+  const handleEditSupplier = (supplier: Supplier) => {
     setIsEditing(true);
     setEditingSupplier(supplier);
   };
 
-  const handleSaveEditSupplier = async (e) => {
+  const handleSaveEditSupplier = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!editingSupplier) return;
 
     if (!editingSupplier.name || !editingSupplier.contact || !editingSupplier.email) {
       alert("Por favor llena todos los campos requeridos.");
@@ -112,7 +115,7 @@ export function Suppliers() {
     }
   };
 
-  const handleDeleteSupplier = async (supplierId) => {
+  const handleDeleteSupplier = async (supplierId: number) => {
     if (!window.confirm("¿Estás seguro de que quieres eliminar este proveedor?")) {
       return;
     }
@@ -221,8 +224,8 @@ export function Suppliers() {
               </button>
             </div>
             <div>
-              <p>Email: {supplier.contact_email}</p>
-              <p>Teléfono: {supplier.contact_phone}</p>
+              <p>Email: {supplier.email}</p>
+              <p>Teléfono: {supplier.phone}</p>
               <p>Dirección: {supplier.address}</p>
             </div>
             {isEditing && editingSupplier && editingSupplier.id === supplier.id && (
@@ -254,22 +257,22 @@ export function Suppliers() {
                   <input
                     type="email"
                     placeholder="Email"
-                    value={editingSupplier.contact_email}
+                    value={editingSupplier.email}
                     onChange={(e) =>
                       setEditingSupplier({
                         ...editingSupplier,
-                        contact_email: e.target.value,
+                        email: e.target.value,
                       })
                     }
                   />
                   <input
                     type="text"
                     placeholder="Teléfono"
-                    value={editingSupplier.contact_phone}
+                    value={editingSupplier.phone}
                     onChange={(e) =>
                       setEditingSupplier({
                         ...editingSupplier,
-                        contact_phone: e.target.value,
+                        phone: e.target.value,
                       })
                     }
                   />

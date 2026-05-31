@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { ENDPOINTS } from "@/lib/utils";
 import { loadDataFromAPI, loadFilteredDataFromAPI, postDataToAPI, putDataToFromAPI, deleteDataFromAPI} from "../../services/api";
-import { Plus, Search, Trash, X, Edit, Check, Badge, Package } from "lucide-react";
+import { Plus, Search, Trash, X, Edit, Check, Package } from "lucide-react";
+import type { Category, TotalProduct } from '@/types';
 
 export function Categories() {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
     search: '', // Campo de búsqueda general que se envía a la API para filtrar por nombre o descripción
@@ -14,9 +16,9 @@ export function Categories() {
     description: '',
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [totalProducts, setTotalProducts] = useState([]);
+  const [totalProducts, setTotalProducts] = useState<TotalProduct[]>([]);
 
   useEffect(() => {
     // Se agrega un pequeño delay para evitar hacer demasiadas llamadas a la API mientras el usuario escribe en el campo de búsqueda
@@ -57,7 +59,7 @@ export function Categories() {
     }
   }, [categories]);
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFilters({
       ...filters,
       search: e.target.value, // Se agrega un campo de búsqueda general que se envía a la API
@@ -65,7 +67,7 @@ export function Categories() {
     console.log(filters)
   };
 
-  const handleAddCategory = async (e) => {
+  const handleAddCategory = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!newCategory.name) {
@@ -87,13 +89,10 @@ export function Categories() {
     }
   }
 
-  const handleEditCategory = (category) => {
-    setIsEditing(true);
-    setEditingCategory(category);
-  };
-
-  const handleSaveEditCategory = async (e) => {
+  const handleSaveEditCategory = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!editingCategory) return;
 
     if (!editingCategory.name || !editingCategory.description) {
       alert("Por favor llena todos los campos requeridos.");
@@ -114,7 +113,7 @@ export function Categories() {
     }
   };
   
-  const handleDeleteCategory = async (categoryId) => {
+  const handleDeleteCategory = async (categoryId: number) => {
     if (!window.confirm("¿Estás seguro de que quieres eliminar esta categoría?")) {
       return;
     }

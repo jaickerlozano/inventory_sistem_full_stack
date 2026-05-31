@@ -1,43 +1,67 @@
 export interface Product {
     id: number;
     name: string;
-    // sku: string;
+    sku: string;
+    description: string | null;
+    category: number;
+    supplier: number;
     current_stock: number;
-    min_stock: number;
-    max_stock: number;
-    supplier_id: number;
-    category_id: number;
-    // price: number;
-    // created_at: string;
-    // updated_at: string;
+    minimum_stock: number;
+    price: string;
 }
 
-// export interface Supplier {
-//     id: number;
-//     name: string;
-//     contact_name: string;
-//     email: string;
-//     phone: string;
-//     address: string;
-//     created_at: string;
-//     updated_at: string;
-// }
+export interface Supplier {
+    id: number;
+    name: string;
+    contact: string;
+    email: string;
+    phone: string;
+    address: string;
+}
 
-// export interface Category {
-//     id: number;
-//     name: string;
-//     description: string;
-//     created_at: string;
-//     updated_at: string;
-// }
+export interface Category {
+    id: number;
+    name: string;
+    description: string;
+}
 
-// export interface StockMovement {
-//     id: number;
-//     product_id: number;
-//     movement_type: "in" | "out";
-//     quantity: number;
-//     reference: string;
-//     notes: string;
-//     created_at: string;
-//     user_id?: number;
-// }
+export interface StockMovement {
+    id: number;
+    product: number;
+    type: 'IN' | 'OUT';
+    quantity: number;
+    timestamp: string;
+    alert?: string;
+}
+
+export interface DashboardData {
+    total_products?: number;
+    low_stock_products?: number;
+    inventory_value?: number | string;
+    [key: string]: unknown;
+}
+
+export interface AlertProduct {
+    id: number;
+    name: string;
+    sku: string | null;
+    current_stock: number;
+    minimum_stock: number;
+    alert_level: 'CRITICAL' | 'HIGH' | 'LOW';
+    category__name?: string;
+}
+
+export interface AlertsResponse {
+    products_with_alerts: AlertProduct[];
+    critical_stock_products: AlertProduct[];
+    high_stock_products: AlertProduct[];
+    low_stock_products: AlertProduct[];
+    total_critical_stock_products: number;
+    total_high_stock_products: number;
+    total_low_stock_products: number;
+}
+
+export interface TotalProduct {
+    id: number;
+    total_products: number;
+}

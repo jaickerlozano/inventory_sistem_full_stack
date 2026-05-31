@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ChevronDown, AlertTriangle, AlertCircle, Info } from 'lucide-react';
+import type { ComponentType } from 'react';
+import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
 import { loadDataFromAPI } from '../../services/api';
 import { ENDPOINTS } from '@/lib/utils';
+import type { Category, AlertsResponse, AlertProduct } from '@/types';
 
 const API_BASE_URL = 'http://localhost:8000/api/inventory';
 
@@ -25,7 +27,7 @@ const ALERT_CONFIG = {
 };
 
 export function Alerts() {
-  const [alerts, setAlerts] = useState({
+  const [alerts, setAlerts] = useState<AlertsResponse>({
     products_with_alerts: [],
     critical_stock_products: [],
     high_stock_products: [],
@@ -34,7 +36,7 @@ export function Alerts() {
     total_high_stock_products: 0,
     total_low_stock_products: 0,
   });
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
     alert: '',
@@ -82,13 +84,18 @@ export function Alerts() {
   }, [filters]);
 
   // Calcular stock percentage (para la barra visual)
-  const getStockPercentage = (current, minimum) => {
+  const getStockPercentage = (current: number, minimum: number): number => {
     if (minimum === 0) return 100;
     return Math.round((current / minimum) * 100);
   };
 
   // Renderizar tarjeta de resumen
-  const SummaryCard = ({ title, count, description, config }) => {
+  const SummaryCard = ({ title, count, description, config }: {
+    title: string;
+    count: number;
+    description: string;
+    config: { label: string; color: string; icon: ComponentType<{ size?: number }> };
+  }) => {
     const Icon = config.icon;
     return (
       <div className={`p-4 rounded-lg border ${config.color}`}>
@@ -103,7 +110,7 @@ export function Alerts() {
   };
 
   // Renderizar producto individual
-  const ProductAlertItem = ({ product }) => {
+  const ProductAlertItem = ({ product }: { product: AlertProduct }) => {
     const config = ALERT_CONFIG[product.alert_level] || ALERT_CONFIG.LOW;
     const Icon = config.icon;
     const percentage = getStockPercentage(product.current_stock, product.minimum_stock);

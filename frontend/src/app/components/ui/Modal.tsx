@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 
-export function Modal({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) {
+export function Modal({ isOpen, children }: { isOpen: boolean; children: React.ReactNode }) {
     if (!isOpen) return null;
 
 return ReactDOM.createPortal(

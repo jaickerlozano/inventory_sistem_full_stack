@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { loadDataFromAPI, loadFilteredDataFromAPI, postDataToAPI, deleteDataFromAPI, putDataToFromAPI } from "../../services/api";
-import { Button } from "@/app/components/Button";
-import { Modal } from "@/app/components/ui/Modal";
-import { Plus, Search, Trash, X, Edit, Check } from "lucide-react";
+import { X, Edit, Trash } from "lucide-react";
 import { ENDPOINTS } from "@/lib/utils";
+import type { Product, Category, Supplier } from '@/types';
 
 export function Products() {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [suppliers, setSuppliers] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [newProduct, setNewProduct] = useState({
@@ -29,7 +29,7 @@ export function Products() {
     supplier: '',
   });
   
-  const [editingProduct, setEditingProduct] = useState(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   // Carga datos iniciales (categorías, proveedores)
@@ -70,7 +70,7 @@ export function Products() {
   }, [filters]);
 
   // Actualizar filtro de búsqueda por nombre
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFilters({
       ...filters,
       name__icontains: e.target.value, 
@@ -78,7 +78,7 @@ export function Products() {
   };
 
   // Actualizar filtro de categoría
-  const handleCategoryChange = (e) => {
+  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setFilters({
       ...filters,
       category: e.target.value
@@ -86,14 +86,14 @@ export function Products() {
   };
 
   // Actualizar filtro de proveedor
-  const handleSupplierChange = (e) => {
+  const handleSupplierChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setFilters({
       ...filters,
       supplier: e.target.value
     });
   };
 
-  const handleAddProduct = async (e) => {
+  const handleAddProduct = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!newProduct.name || !newProduct.current_stock || !newProduct.minimum_stock) {
@@ -138,7 +138,7 @@ export function Products() {
     }
   }
 
-  const handleDeleteProduct = async (productId) => {
+  const handleDeleteProduct = async (productId: number) => {
     if (!window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
       return;
     }
@@ -158,13 +158,15 @@ export function Products() {
     }
   }
 
-  const handleEditProduct = (product) => {
+  const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setIsEditOpen(true);
   }
 
-  const handleSaveEditProduct = async (e) => {
+  const handleSaveEditProduct = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!editingProduct) return;
 
     if (!editingProduct.name || !editingProduct.current_stock || !editingProduct.minimum_stock) {
       alert("Por favor llena todos los campos requeridos.");
@@ -206,7 +208,7 @@ export function Products() {
 
         {isOpen && (
           <div>
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><Button onClick={() => setIsOpen(false)}><X /></Button></div>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><button onClick={() => setIsOpen(false)}><X /></button></div>
             <div>
               <form action="" onSubmit={(e) => {
                 e.preventDefault();
@@ -236,7 +238,7 @@ export function Products() {
                    required/>
                 <select
                   value={newProduct.category ? newProduct.category.toString() : ''}
-                  onChange={(e) => setNewProduct({...newProduct, category: e.target.value ? parseInt(e.target.value) : ''})}
+                  onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
                 >
                   <option value="">Selecciona una categoría</option>
                   {categories.map((category) => (
@@ -284,7 +286,7 @@ export function Products() {
             onChange={handleSearchChange}
           />
           <select 
-            value={filters.category__name__exact}
+            value={filters.category}
             onChange={handleCategoryChange}
           >
             <option value="">Todas las categorías</option>
@@ -295,7 +297,7 @@ export function Products() {
             ))}
           </select>
           <select
-            value={filters.supplier__name__exact}
+            value={filters.supplier}
             onChange={handleSupplierChange}
           >
             <option value="">Todos los proveedores</option>
@@ -350,26 +352,26 @@ export function Products() {
                       <input
                         type="text"
                         placeholder="Descripción del producto..."
-                        value={editingProduct.description}
+                        value={editingProduct.description ?? ''}
                         onChange={(e) => setEditingProduct({...editingProduct, description: e.target.value})}
                       />
                       <input
                         type="number"
                         placeholder="Stock actual..."
                         value={editingProduct.current_stock}
-                        onChange={(e) => setEditingProduct({...editingProduct, current_stock: e.target.value})}
+                        onChange={(e) => setEditingProduct({...editingProduct, current_stock: Number(e.target.value)})}
                         required
                       />
                       <input
                         type="number"
                         placeholder="Stock mínimo..."
                         value={editingProduct.minimum_stock}
-                        onChange={(e) => setEditingProduct({...editingProduct, minimum_stock: e.target.value})}
+                        onChange={(e) => setEditingProduct({...editingProduct, minimum_stock: Number(e.target.value)})}
                         required
                       />
                       <select
                         value={editingProduct.category ? editingProduct.category.toString() : ''}
-                        onChange={(e) => setEditingProduct({...editingProduct, category: e.target.value ? parseInt(e.target.value) : ''})}
+                        onChange={(e) => setEditingProduct({...editingProduct, category: Number(e.target.value)})}
                       >
                         <option value="">Selecciona una categoría</option>
                         {categories.map((category) => (
@@ -380,7 +382,7 @@ export function Products() {
                       </select>
                       <select
                         value={editingProduct.supplier}
-                        onChange={(e) => setEditingProduct({...editingProduct, supplier: e.target.value})}
+                        onChange={(e) => setEditingProduct({...editingProduct, supplier: Number(e.target.value)})}
                       >
                         <option value="">Selecciona un proveedor</option>
                         {suppliers.map((supplier) => (

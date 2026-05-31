@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { ENDPOINTS } from '@/lib/utils';
 import { loadDataFromAPI } from '../../services/api';
+import type { Product, DashboardData } from '@/types';
 
 export function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
-  const [dashboardData, setDashboardData] = useState({});
-  const [lowStockProducts, setLowStockProducts] = useState([]);
+  const [dashboardData, setDashboardData] = useState<DashboardData>({});
+  const [lowStockProducts, setLowStockProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     const fetchAll = async () => {
