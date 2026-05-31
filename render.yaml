@@ -3,7 +3,7 @@ services:
     name: inventory-api
     runtime: python
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate
     startCommand: gunicorn core.wsgi:application --log-file -
     envVars:
       - key: SECRET_KEY
