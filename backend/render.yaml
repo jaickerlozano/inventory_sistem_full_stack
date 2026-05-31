@@ -11,19 +11,29 @@ services:
       - key: DEBUG
         value: "false"
       - key: DATABASE_URL
-        fromDatabase:
-          name: inventory-db
-          property: connectionString
+        sync: false
       - key: ALLOWED_HOSTS
-        value: .onrender.com,localhost,127.0.0.1
+        value: inventory-sistem-full-stack.onrender.com,localhost,127.0.0.1
       - key: CORS_ALLOWED_ORIGINS
-        value: http://localhost:5173
+        value: https://inventory-sistem-frontend.onrender.com,http://localhost:5173
       - key: PYTHON_VERSION
         value: "3.12"
     healthCheckPath: /api/inventory/products/
     autoDeploy: true
 
-databases:
-  - name: inventory-db
-    databaseName: inventory
-    plan: free
+  - type: web
+    name: inventory-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: pnpm install && pnpm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://inventory-sistem-full-stack.onrender.com/api/inventory
+      - key: NODE_VERSION
+        value: "22"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    autoDeploy: true
