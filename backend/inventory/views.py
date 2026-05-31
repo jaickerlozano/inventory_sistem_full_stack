@@ -2,7 +2,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from django.db.models import Count, F, Sum, Q, Case, When, Value, CharField
+from django.db.models import Count, F, Sum, Q, Case, When, Value, CharField, FloatField, ExpressionWrapper
 from rest_framework.decorators import action
 from .serializer import ProductSerializer, CategorySerializer, SupplierSerializer, StockMovementSerializer
 from .models import Product, Category, Supplier, StockMovement
@@ -49,10 +49,14 @@ class DashboardView(APIView):
 class AlertsView(APIView):
     def get(self, request, format=None):
         # Anotar el nivel de alerta en cada producto basado en stock actual
+        # Use ExpressionWrapper to ensure float arithmetic in PostgreSQL
+        threshold_30 = ExpressionWrapper(F('minimum_stock') * 0.3, output_field=FloatField())
+        threshold_60 = ExpressionWrapper(F('minimum_stock') * 0.6, output_field=FloatField())
+
         products_with_alert = Product.objects.annotate(
             alert_level=Case(
-                When(current_stock__lte=F('minimum_stock') * 0.3, then=Value('CRITICAL')),
-                When(current_stock__lte=F('minimum_stock') * 0.6, then=Value('HIGH')),
+                When(current_stock__lte=threshold_30, then=Value('CRITICAL')),
+                When(current_stock__lte=threshold_60, then=Value('HIGH')),
                 When(current_stock__lt=F('minimum_stock'), then=Value('LOW')),
                 default=Value('REGULAR'),
                 output_field=CharField(),
@@ -245,10 +249,12 @@ class StockMovementViewSet(viewsets.ModelViewSet):
         queryset = StockMovement.objects.all()
         
         # Anotar con el nivel de alerta basado en el producto
+        threshold_30 = ExpressionWrapper(F('product__minimum_stock') * 0.3, output_field=FloatField())
+        threshold_60 = ExpressionWrapper(F('product__minimum_stock') * 0.6, output_field=FloatField())
         queryset = queryset.annotate(
             alert=Case(
-                When(product__current_stock__lte=F('product__minimum_stock') * 0.3, then=Value('CRITICAL')),
-                When(product__current_stock__lte=F('product__minimum_stock') * 0.6, then=Value('HIGH')),
+                When(product__current_stock__lte=threshold_30, then=Value('CRITICAL')),
+                When(product__current_stock__lte=threshold_60, then=Value('HIGH')),
                 When(product__current_stock__lt=F('product__minimum_stock'), then=Value('LOW')),
                 default=Value('REGULAR'),
                 output_field=CharField(),

@@ -215,21 +215,35 @@ export function Products() {
     [suppliers],
   );
 
-  // Determina el badge de stock según current_stock vs minimum_stock
+  // Determina el badge de stock según current_stock vs minimum_stock (3 niveles)
   const getStockBadge = (current: number, minimum: number) => {
-    if (current <= minimum) {
+    if (minimum === 0) {
+      return {
+        label: "OK",
+        className: "bg-chart-2/10 text-chart-2 border-chart-2/20",
+        dot: "bg-chart-2",
+      };
+    }
+    const ratio = current / minimum;
+    if (ratio <= 0.3) {
       return {
         label: "Crítico",
         className: "bg-destructive/10 text-destructive border-destructive/20",
         dot: "bg-destructive",
       };
     }
-    if (current <= minimum * 1.5) {
+    if (ratio <= 0.6) {
+      return {
+        label: "Alto",
+        className: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+        dot: "bg-amber-500",
+      };
+    }
+    if (current < minimum) {
       return {
         label: "Bajo",
-        className:
-          "bg-chart-1/10 text-chart-1 border-chart-1/20",
-        dot: "bg-chart-1",
+        className: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20",
+        dot: "bg-yellow-500",
       };
     }
     return {
