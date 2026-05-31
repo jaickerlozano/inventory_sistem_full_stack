@@ -175,7 +175,7 @@ export function Suppliers() {
               id="supplier-name"
               type="text"
               placeholder="Nombre del proveedor"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("name", {
                 required: "El nombre del proveedor es obligatorio",
               })}
@@ -197,7 +197,7 @@ export function Suppliers() {
               id="supplier-contact"
               type="text"
               placeholder="Nombre de la persona de contacto"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("contact", {
                 required: "El nombre del contacto es obligatorio",
               })}
@@ -219,7 +219,7 @@ export function Suppliers() {
               id="supplier-email"
               type="email"
               placeholder="correo@ejemplo.com"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("email", {
                 required: "El email es obligatorio",
                 pattern: {
@@ -245,7 +245,7 @@ export function Suppliers() {
               id="supplier-phone"
               type="text"
               placeholder="Teléfono (opcional)"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("phone")}
             />
           </div>
@@ -260,7 +260,7 @@ export function Suppliers() {
               id="supplier-address"
               type="text"
               placeholder="Dirección (opcional)"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("address")}
             />
           </div>
@@ -305,7 +305,7 @@ export function Suppliers() {
               id="edit-supplier-name"
               type="text"
               placeholder="Nombre del proveedor"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("name", {
                 required: "El nombre del proveedor es obligatorio",
               })}
@@ -327,7 +327,7 @@ export function Suppliers() {
               id="edit-supplier-contact"
               type="text"
               placeholder="Nombre de la persona de contacto"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("contact", {
                 required: "El nombre del contacto es obligatorio",
               })}
@@ -349,7 +349,7 @@ export function Suppliers() {
               id="edit-supplier-email"
               type="email"
               placeholder="correo@ejemplo.com"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("email", {
                 required: "El email es obligatorio",
                 pattern: {
@@ -375,7 +375,7 @@ export function Suppliers() {
               id="edit-supplier-phone"
               type="text"
               placeholder="Teléfono (opcional)"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("phone")}
             />
           </div>
@@ -390,7 +390,7 @@ export function Suppliers() {
               id="edit-supplier-address"
               type="text"
               placeholder="Dirección (opcional)"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("address")}
             />
           </div>

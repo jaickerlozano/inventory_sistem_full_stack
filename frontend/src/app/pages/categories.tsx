@@ -178,7 +178,7 @@ export function Categories() {
               id="category-name"
               type="text"
               placeholder="Nombre de la categoría"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("name", {
                 required: "El nombre de la categoría es obligatorio",
               })}
@@ -200,7 +200,7 @@ export function Categories() {
               id="category-desc"
               type="text"
               placeholder="Descripción (opcional)"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("description")}
             />
           </div>
@@ -245,7 +245,7 @@ export function Categories() {
               id="edit-category-name"
               type="text"
               placeholder="Nombre de la categoría"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("name", {
                 required: "El nombre de la categoría es obligatorio",
               })}
@@ -267,7 +267,7 @@ export function Categories() {
               id="edit-category-desc"
               type="text"
               placeholder="Descripción (opcional)"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("description")}
             />
           </div>

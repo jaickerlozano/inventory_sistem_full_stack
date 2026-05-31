@@ -122,7 +122,7 @@ export function StockMovements() {
             </label>
             <select
               id="movement-product"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...register("product", {
                 required: "Selecciona un producto",
               })}
@@ -151,7 +151,7 @@ export function StockMovements() {
             </label>
             <select
               id="movement-type"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...register("type", {
                 required: "Selecciona el tipo de movimiento",
               })}
@@ -179,7 +179,7 @@ export function StockMovements() {
               id="movement-quantity"
               type="number"
               min={1}
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...register("quantity", {
                 required: "La cantidad es requerida",
                 min: { value: 1, message: "La cantidad debe ser mayor a 0" },

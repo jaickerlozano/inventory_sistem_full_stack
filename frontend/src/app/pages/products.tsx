@@ -279,7 +279,7 @@ export function Products() {
               id="product-name"
               type="text"
               placeholder="Nombre del producto"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("name", {
                 required: "El nombre del producto es obligatorio",
               })}
@@ -301,7 +301,7 @@ export function Products() {
               id="product-sku"
               type="text"
               placeholder="SKU (opcional)"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("sku")}
             />
           </div>
@@ -316,7 +316,7 @@ export function Products() {
               id="product-desc"
               type="text"
               placeholder="Descripción (opcional)"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("description")}
             />
           </div>
@@ -332,7 +332,7 @@ export function Products() {
                 id="product-stock"
                 type="number"
                 placeholder="0"
-                className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+                className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
                 {...createForm.register("current_stock", {
                   required: "El stock actual es obligatorio",
                   valueAsNumber: true,
@@ -356,7 +356,7 @@ export function Products() {
                 id="product-min-stock"
                 type="number"
                 placeholder="0"
-                className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+                className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
                 {...createForm.register("minimum_stock", {
                   required: "El stock mínimo es obligatorio",
                   valueAsNumber: true,
@@ -379,7 +379,7 @@ export function Products() {
             </label>
             <select
               id="product-category"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("category")}
             >
               <option value="">Selecciona una categoría</option>
@@ -399,7 +399,7 @@ export function Products() {
             </label>
             <select
               id="product-supplier"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("supplier")}
             >
               <option value="">Selecciona un proveedor</option>
@@ -422,7 +422,7 @@ export function Products() {
               type="number"
               step="0.01"
               placeholder="0.00"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...createForm.register("price", {
                 required: "El precio es obligatorio",
               })}
@@ -474,7 +474,7 @@ export function Products() {
               id="edit-product-name"
               type="text"
               placeholder="Nombre del producto"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("name", {
                 required: "El nombre del producto es obligatorio",
               })}
@@ -496,7 +496,7 @@ export function Products() {
               id="edit-product-sku"
               type="text"
               placeholder="SKU (opcional)"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("sku")}
             />
           </div>
@@ -511,7 +511,7 @@ export function Products() {
               id="edit-product-desc"
               type="text"
               placeholder="Descripción (opcional)"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("description")}
             />
           </div>
@@ -527,7 +527,7 @@ export function Products() {
                 id="edit-product-stock"
                 type="number"
                 placeholder="0"
-                className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+                className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
                 {...editForm.register("current_stock", {
                   required: "El stock actual es obligatorio",
                   valueAsNumber: true,
@@ -551,7 +551,7 @@ export function Products() {
                 id="edit-product-min-stock"
                 type="number"
                 placeholder="0"
-                className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+                className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
                 {...editForm.register("minimum_stock", {
                   required: "El stock mínimo es obligatorio",
                   valueAsNumber: true,
@@ -574,7 +574,7 @@ export function Products() {
             </label>
             <select
               id="edit-product-category"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("category")}
             >
               <option value="">Selecciona una categoría</option>
@@ -594,7 +594,7 @@ export function Products() {
             </label>
             <select
               id="edit-product-supplier"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("supplier")}
             >
               <option value="">Selecciona un proveedor</option>
@@ -617,7 +617,7 @@ export function Products() {
               type="number"
               step="0.01"
               placeholder="0.00"
-              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+              className="w-full rounded-md border border-input bg-input-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
               {...editForm.register("price", {
                 required: "El precio es obligatorio",
               })}

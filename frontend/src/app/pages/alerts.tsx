@@ -193,7 +193,7 @@ export function Alerts() {
           <select
             value={filters.alert}
             onChange={(e) => setFilters({ ...filters, alert: e.target.value })}
-            className="px-3 py-2 border rounded-md bg-white"
+            className="px-3 py-2 border border-input rounded-md bg-input-background text-foreground"
           >
             <option value="">Todos los niveles</option>
             <option value="CRITICAL">Críticas</option>
@@ -204,7 +204,7 @@ export function Alerts() {
           <select
             value={filters.category}
             onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-            className="px-3 py-2 border rounded-md bg-white"
+            className="px-3 py-2 border border-input rounded-md bg-input-background text-foreground"
           >
             <option value="">Todas las categorías</option>
             {categories.map((category) => (
