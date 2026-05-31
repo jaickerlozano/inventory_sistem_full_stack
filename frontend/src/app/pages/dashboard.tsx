@@ -41,9 +41,9 @@ export function Dashboard() {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="p-6 space-y-6">
+      <div className="px-4 py-6 sm:px-6 space-y-4 sm:space-y-6">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">Resumen general del inventario</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -62,10 +62,10 @@ export function Dashboard() {
   const totalMovements = lowStockProducts.length;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-4 py-6 sm:px-6 space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-xl sm:text-2xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground">Resumen general del inventario</p>
       </div>
 
@@ -155,7 +155,7 @@ export function Dashboard() {
                         </div>
                         <p className="text-sm text-muted-foreground">SKU: {product.sku || 'N/A'}</p>
                       </div>
-                      <div className="text-right min-w-[120px]">
+                      <div className="text-right min-w-[80px] sm:min-w-[120px]">
                         <p className="text-sm">
                           Stock: <strong>{product.current_stock}</strong> / Mín: {product.minimum_stock}
                         </p>

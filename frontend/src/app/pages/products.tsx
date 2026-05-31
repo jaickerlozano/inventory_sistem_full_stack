@@ -240,11 +240,11 @@ export function Products() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-4 py-6 sm:px-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold">Productos</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Productos</h1>
           <p className="text-muted-foreground">
             Administra tu catálogo de productos e inventario
           </p>
@@ -320,7 +320,7 @@ export function Products() {
               {...createForm.register("description")}
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label
                 htmlFor="product-stock"
@@ -515,7 +515,7 @@ export function Products() {
               {...editForm.register("description")}
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label
                 htmlFor="edit-product-stock"
@@ -785,14 +785,14 @@ export function Products() {
                       className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <Edit className="h-4 w-4" />
-                      Editar
+                      <span className="hidden sm:inline">Editar</span>
                     </button>
                     <button
                       onClick={() => handleDelete(product.id)}
                       className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-destructive transition-colors"
                     >
                       <Trash className="h-4 w-4" />
-                      Eliminar
+                      <span className="hidden sm:inline">Eliminar</span>
                     </button>
                   </div>
                 </div>

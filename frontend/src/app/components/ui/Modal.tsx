@@ -31,11 +31,14 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
     } else {
       document.body.style.overflow = "";
+      document.body.style.touchAction = "";
     }
     return () => {
       document.body.style.overflow = "";
+      document.body.style.touchAction = "";
     };
   }, [isOpen]);
 
@@ -57,7 +60,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
 
       {/* Card */}
       <div
-        className="relative z-10 w-full max-w-lg mx-4 rounded-lg border border-border bg-card text-card-foreground shadow-lg"
+        className="relative z-10 w-full max-w-lg max-h-[calc(100vh-2rem)] mx-4 overflow-y-auto rounded-lg border border-border bg-card text-card-foreground shadow-lg overscroll-contain"
         onClick={(e: MouseEvent) => e.stopPropagation()}
       >
         {/* Header */}

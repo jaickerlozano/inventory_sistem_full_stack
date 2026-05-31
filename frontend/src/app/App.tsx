@@ -13,7 +13,8 @@ function App() {
   return (
     <BrowserRouter>
       <Toaster
-        position="top-right"
+        position="top-center"
+        gutter={16}
         toastOptions={{
           duration: 4000,
           style: {

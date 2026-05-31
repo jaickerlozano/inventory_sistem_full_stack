@@ -10,17 +10,17 @@ import { Card } from '@/app/components/ui/Card';
 const ALERT_CONFIG = {
   CRITICAL: {
     label: 'Crítica',
-    color: 'text-red-700 bg-red-100 border-red-300',
+    color: 'text-destructive bg-destructive/10 border-destructive/30',
     icon: AlertTriangle,
   },
   HIGH: {
     label: 'Alta',
-    color: 'text-orange-700 bg-orange-100 border-orange-300',
+    color: 'text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700',
     icon: AlertCircle,
   },
   LOW: {
     label: 'Baja',
-    color: 'text-yellow-700 bg-yellow-100 border-yellow-300',
+    color: 'text-yellow-700 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700',
     icon: Info,
   },
 };
@@ -126,7 +126,7 @@ export function Alerts() {
                 {config.label}
               </span>
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               <span>SKU: {product.sku || 'N/A'}</span>
               <span className="mx-2">·</span>
               <span>{product.category__name || 'Sin categoría'}</span>
@@ -134,21 +134,21 @@ export function Alerts() {
           </div>
 
           {/* Stock info */}
-          <div className="text-right min-w-[140px]">
+          <div className="text-right min-w-[80px] sm:min-w-[140px]">
             <p className="text-sm">
               Stock: <strong>{product.current_stock}</strong> / Mín: {product.minimum_stock}
             </p>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+            <div className="w-full bg-muted rounded-full h-2 mt-1">
               <div
-                className={`h-2 rounded-full ${
-                  percentage <= 30 ? 'bg-red-500' :
-                  percentage <= 60 ? 'bg-orange-500' :
-                  'bg-yellow-500'
-                }`}
+                  className={`h-2 rounded-full ${
+                    percentage <= 30 ? 'bg-destructive' :
+                    percentage <= 60 ? 'bg-amber-500' :
+                    'bg-yellow-500'
+                  }`}
                 style={{ width: `${Math.min(percentage, 100)}%` }}
               />
             </div>
-            <span className="text-xs text-gray-500">{percentage}% del mínimo</span>
+            <span className="text-xs text-muted-foreground">{percentage}% del mínimo</span>
           </div>
         </div>
       </li>
@@ -156,11 +156,11 @@ export function Alerts() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-4 py-6 sm:px-6 space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Alertas de Stock</h1>
-        <p className="text-gray-500">Productos que requieren atención inmediata</p>
+        <h1 className="text-xl sm:text-2xl font-bold">Alertas de Stock</h1>
+        <p className="text-muted-foreground">Productos que requieren atención inmediata</p>
       </div>
 
       {/* Tarjetas de resumen */}
@@ -232,16 +232,16 @@ export function Alerts() {
         <h2 className="text-lg font-semibold mb-3">
           Productos con alerta
           {productsWithAlerts.length > 0 && (
-            <span className="text-sm font-normal text-gray-500 ml-2">
+            <span className="text-sm font-normal text-muted-foreground ml-2">
               ({productsWithAlerts.length} encontrado{productsWithAlerts.length !== 1 ? 's' : ''})
             </span>
           )}
         </h2>
 
         {isLoading ? (
-          <p className="text-gray-500">Cargando...</p>
+          <p className="text-muted-foreground">Cargando...</p>
         ) : productsWithAlerts.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">
+          <p className="text-muted-foreground text-center py-8">
             No hay productos con alertas{filters.alert || filters.category ? ' para los filtros seleccionados' : ''}.
           </p>
         ) : (

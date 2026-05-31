@@ -136,11 +136,11 @@ export function Suppliers() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-4 py-6 sm:px-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold">Proveedores</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Proveedores</h1>
           <p className="text-muted-foreground">
             Administra tus proveedores y contactos
           </p>
@@ -492,14 +492,14 @@ export function Suppliers() {
                   className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Edit className="h-4 w-4" />
-                  Editar
+                  <span className="hidden sm:inline">Editar</span>
                 </button>
                 <button
                   onClick={() => handleDelete(supplier.id)}
                   className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-destructive transition-colors ml-auto"
                 >
                   <Trash className="h-4 w-4" />
-                  Eliminar
+                  <span className="hidden sm:inline">Eliminar</span>
                 </button>
               </div>
             </Card>
