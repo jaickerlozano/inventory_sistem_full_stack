@@ -4,6 +4,7 @@ import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
 import { loadDataFromAPI } from '../../services/api';
 import { ENDPOINTS } from '@/lib/utils';
 import type { Category, AlertsResponse, AlertProduct } from '@/types';
+import { Card } from '@/app/components/ui/Card';
 
 const API_BASE_URL = 'http://localhost:8000/api/inventory';
 
@@ -187,44 +188,46 @@ export function Alerts() {
       </div>
 
       {/* Filtros */}
-      <div className="bg-gray-50 p-4 rounded-lg">
-        <h3 className="font-semibold mb-3">Filtros</h3>
-        <div className="flex flex-wrap gap-3">
-          <select
-            value={filters.alert}
-            onChange={(e) => setFilters({ ...filters, alert: e.target.value })}
-            className="px-3 py-2 border border-input rounded-md bg-input-background text-foreground"
-          >
-            <option value="">Todos los niveles</option>
-            <option value="CRITICAL">Críticas</option>
-            <option value="HIGH">Altas</option>
-            <option value="LOW">Bajas</option>
-          </select>
-
-          <select
-            value={filters.category}
-            onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-            className="px-3 py-2 border border-input rounded-md bg-input-background text-foreground"
-          >
-            <option value="">Todas las categorías</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Botón para limpiar filtros */}
-          {(filters.alert || filters.category) && (
-            <button
-              onClick={() => setFilters({ alert: '', category: '' })}
-              className="px-3 py-2 text-sm text-red-600 hover:text-red-800 border border-red-300 rounded-md hover:bg-red-50"
+      <Card>
+        <div className="p-4">
+          <h3 className="font-semibold mb-3 text-card-foreground">Filtros</h3>
+          <div className="flex flex-wrap gap-3">
+            <select
+              value={filters.alert}
+              onChange={(e) => setFilters({ ...filters, alert: e.target.value })}
+              className="px-3 py-2 border border-input rounded-md bg-input-background text-foreground text-sm"
             >
-              Limpiar filtros
-            </button>
-          )}
+              <option value="">Todos los niveles</option>
+              <option value="CRITICAL">Críticas</option>
+              <option value="HIGH">Altas</option>
+              <option value="LOW">Bajas</option>
+            </select>
+
+            <select
+              value={filters.category}
+              onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+              className="px-3 py-2 border border-input rounded-md bg-input-background text-foreground text-sm"
+            >
+              <option value="">Todas las categorías</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Botón para limpiar filtros */}
+            {(filters.alert || filters.category) && (
+              <button
+                onClick={() => setFilters({ alert: '', category: '' })}
+                className="px-3 py-2 text-sm text-destructive hover:text-destructive-foreground border border-destructive rounded-md hover:bg-destructive"
+              >
+                Limpiar filtros
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      </Card>
 
       {/* Lista de productos con alerta */}
       <div>
