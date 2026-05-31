@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/inventory";
+// Normalize: always ensure trailing slash for correct URL concatenation
+const _raw = import.meta.env.VITE_API_URL || "http://localhost:8000/api/inventory";
+export const API_BASE_URL = _raw.endsWith('/') ? _raw : `${_raw}/`;
 
 type SetData<T> = (data: T) => void;
 

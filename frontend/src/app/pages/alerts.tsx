@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import type { ComponentType } from 'react';
 import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
-import { loadDataFromAPI } from '../../services/api';
+import { loadDataFromAPI, API_BASE_URL } from '../../services/api';
 import { ENDPOINTS } from '@/lib/utils';
 import type { Category, AlertsResponse, AlertProduct } from '@/types';
 import { Card } from '@/app/components/ui/Card';
-
-const API_BASE_URL = 'http://localhost:8000/api/inventory';
 
 // Mapeo de nivel de alerta a configuración visual
 const ALERT_CONFIG = {
