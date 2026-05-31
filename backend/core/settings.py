@@ -126,8 +126,12 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS configuration — read from comma-separated env var, default to local dev
-CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=['http://localhost:5173'])
+# CORS configuration — robust parsing to handle trailing whitespace/newlines from Render
+_raw_cors = env.str('CORS_ALLOWED_ORIGINS', default='http://localhost:5173')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in _raw_cors.split(',') if origin.strip()]
+
+# Allow credentials for JWT auth
+CORS_ALLOW_CREDENTIALS = True
 
 # Configuración de REST Framework
 REST_FRAMEWORK = {
