@@ -142,28 +142,33 @@ class ProductViewSet(viewsets.ModelViewSet):
     # Sobreescribimos el método update para manejar la lógica de actualización de productos con stock
     def update(self, request, *args, **kwargs):
         """
-        Actualizar un producto y registrar un movimiento de stock si se cambia el current_stock
+        Actualizar un producto y registrar un movimiento de stock si se cambia el current_stock.
+        Utiliza select_for_update() para prevenir condiciones de carrera en modificaciones concurrentes.
         """
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         old_stock = instance.current_stock  # Guardamos el stock actual antes de actualizar
 
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        product = serializer.save()  # Guardamos el producto actualizado
+        # Use a transaction with row-level locking to prevent race conditions
+        with transaction.atomic():
+            # Re-fetch with select_for_update() to lock the row
+            instance = Product.objects.select_for_update().get(pk=instance.pk)
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            product = serializer.save()  # Guardamos el producto actualizado
 
-        new_stock = product.current_stock  # Obtenemos el nuevo stock después de actualizar
+            new_stock = product.current_stock  # Obtenemos el nuevo stock después de actualizar
 
-        # Si el stock ha cambiado, registramos un movimiento de stock
-        if new_stock != old_stock:
-            movement_type = 'IN' if new_stock > old_stock else 'OUT'
-            StockMovement.objects.create(
-                product=product,
-                type=movement_type,
-                quantity=abs(new_stock - old_stock)  # Cantidad del movimiento es la diferencia absoluta
-            )
+            # Si el stock ha cambiado, registramos un movimiento de stock
+            if new_stock != old_stock:
+                movement_type = 'IN' if new_stock > old_stock else 'OUT'
+                StockMovement.objects.create(
+                    product=product,
+                    type=movement_type,
+                    quantity=abs(new_stock - old_stock)  # Cantidad del movimiento es la diferencia absoluta
+                )
 
-        return Response(serializer.data)
+            return Response(serializer.data)
 
     @action(detail=False, methods=['get'])
     def lowstockproducts(self, request):
@@ -264,8 +269,8 @@ class StockMovementViewSet(viewsets.ModelViewSet):
                 movement_type = request.data.get('type')  # 'IN' o 'OUT'
                 quantity = int(request.data.get('quantity'))
                 
-                # Obtener el producto
-                product = Product.objects.get(id=product_id)
+                # Obtener el producto con bloqueo de fila para prevenir condiciones de carrera
+                product = Product.objects.select_for_update().get(id=product_id)
                 
                 # Validar que la cantidad sea positiva
                 if quantity <= 0:

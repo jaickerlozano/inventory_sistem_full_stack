@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8000/api/inventory";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/inventory";
 
 type SetData<T> = (data: T) => void;
 
