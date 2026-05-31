@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { Toaster } from "react-hot-toast"
 import { Dashboard } from "./pages/dashboard"
 import { Products } from "./pages/products"
 import { Suppliers } from "./pages/suppliers"
@@ -11,6 +12,17 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "var(--color-card)",
+            color: "var(--color-card-foreground)",
+            border: "1px solid var(--color-border)",
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
