@@ -65,3 +65,16 @@ export interface TotalProduct {
     id: number;
     total_products: number;
 }
+
+/** Datos para el gráfico de barras: entradas vs salidas por mes */
+export interface BarChartData {
+    month: string;
+    entries: number;
+    exits: number;
+}
+
+/** Datos para el gráfico de línea: tendencia de movimientos por mes */
+export interface LineChartData {
+    month: string;
+    total: number;
+}

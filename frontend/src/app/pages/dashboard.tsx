@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Package, AlertTriangle, DollarSign, ShoppingCart, BarChart3, TrendingUp } from 'lucide-react';
 import { ENDPOINTS } from '@/lib/utils';
 import { loadDataFromAPI } from '../../services/api';
-import type { Product, DashboardData } from '@/types';
+import type { Product, DashboardData, StockMovement, BarChartData, LineChartData } from '@/types';
 import { Card } from '@/app/components/ui/Card';
+import { StockMovementBarChart, MovementTrendLineChart } from "../components/Graphics";
+
+// ============================================================
+// Helpers
+// ============================================================
 
 function formatCurrency(value: number | string | undefined): string {
   if (value === undefined || value === null) return '$0';
@@ -16,10 +21,71 @@ function formatCurrency(value: number | string | undefined): string {
   }).format(num);
 }
 
+/** Nombres abreviados de meses en español */
+const MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+/**
+ * Procesa los movimientos de stock y los agrupa por mes.
+ * Devuelve dos arrays: uno para el gráfico de barras y otro para el de línea.
+ */
+function processMovementsByMonth(movements: StockMovement[]): { barData: BarChartData[]; lineData: LineChartData[] } {
+  // Mapa para acumular datos por mes: "YYYY-MM" -> { entries, exits, total }
+  const monthlyMap = new Map<string, { entries: number; exits: number; total: number }>();
+
+  for (const movement of movements) {
+    const date = new Date(movement.timestamp);
+    // Clave tipo "2024-01" para enero 2024
+    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+    if (!monthlyMap.has(monthKey)) {
+      monthlyMap.set(monthKey, { entries: 0, exits: 0, total: 0 });
+    }
+
+    const bucket = monthlyMap.get(monthKey)!;
+    if (movement.type === 'IN') {
+      bucket.entries += movement.quantity;
+    } else if (movement.type === 'OUT') {
+      bucket.exits += movement.quantity;
+    }
+    bucket.total += movement.quantity;
+  }
+
+  // Ordenar por mes (cronológico) y tomar los últimos 6 meses
+  const sortedKeys = Array.from(monthlyMap.keys()).sort();
+  const last6Keys = sortedKeys.slice(-6);
+
+  const barData: BarChartData[] = [];
+  const lineData: LineChartData[] = [];
+
+  for (const key of last6Keys) {
+    const [, monthStr] = key.split('-');
+    const monthIndex = parseInt(monthStr, 10) - 1; // Convertir a índice 0-based
+    const data = monthlyMap.get(key)!;
+
+    barData.push({
+      month: MONTH_NAMES[monthIndex],
+      entries: data.entries,
+      exits: data.exits,
+    });
+
+    lineData.push({
+      month: MONTH_NAMES[monthIndex],
+      total: data.total,
+    });
+  }
+
+  return { barData, lineData };
+}
+
+// ============================================================
+// Componente Dashboard
+// ============================================================
+
 export function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState<DashboardData>({});
   const [lowStockProducts, setLowStockProducts] = useState<Product[]>([]);
+  const [movements, setMovements] = useState<StockMovement[]>([]);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -28,6 +94,7 @@ export function Dashboard() {
         await Promise.all([
           loadDataFromAPI(ENDPOINTS.DASHBOARD, setDashboardData),
           loadDataFromAPI(ENDPOINTS.LOW_STOCK_PRODUCTS, setLowStockProducts),
+          loadDataFromAPI(ENDPOINTS.STOCK_MOVEMENTS, setMovements),
         ]);
       } catch (error) {
         console.error("Error cargando datos:", error);
@@ -37,6 +104,12 @@ export function Dashboard() {
     };
     fetchAll();
   }, []);
+
+  // Procesar movimientos para los gráficos (se recalcula cuando cambian los movimientos)
+  const { barData, lineData } = useMemo(
+    () => processMovementsByMonth(movements),
+    [movements]
+  );
 
   // Loading skeleton
   if (isLoading) {
@@ -59,7 +132,6 @@ export function Dashboard() {
   }
 
   const hasData = dashboardData.total_products !== undefined;
-  const totalMovements = lowStockProducts.length;
 
   return (
     <div className="px-4 py-6 sm:px-6 space-y-4 sm:space-y-6">
@@ -102,32 +174,30 @@ export function Dashboard() {
                 <ShoppingCart className="h-5 w-5 text-chart-1" />
                 <p className="text-sm text-muted-foreground">Total de movimientos</p>
               </div>
-              <p className="text-2xl font-bold">{totalMovements}</p>
+              <p className="text-2xl font-bold">{movements.length}</p>
             </Card>
           </div>
 
-          {/* Charts placeholder — two cards side by side */}
+          {/* Charts — dos cards lado a lado */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Gráfico de barras: Entradas vs Salidas */}
             <Card className="p-6">
               <div className="flex items-center gap-2 mb-1">
                 <BarChart3 className="h-5 w-5 text-muted-foreground" />
                 <h2 className="font-semibold">Movimiento de Stock</h2>
               </div>
               <p className="text-sm text-muted-foreground mb-4">Entradas vs Salidas — Últimos 6 meses</p>
-              <div className="flex items-center justify-center h-48 bg-muted/50 rounded-md border border-border">
-                <p className="text-muted-foreground text-sm">Gráfico disponible próximamente</p>
-              </div>
+              <StockMovementBarChart data={barData} />
             </Card>
 
+            {/* Gráfico de línea: Tendencia de movimientos */}
             <Card className="p-6">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="h-5 w-5 text-muted-foreground" />
                 <h2 className="font-semibold">Tendencia de Movimientos</h2>
               </div>
               <p className="text-sm text-muted-foreground mb-4">Evolución Mensual</p>
-              <div className="flex items-center justify-center h-48 bg-muted/50 rounded-md border border-border">
-                <p className="text-muted-foreground text-sm">Gráfico disponible próximamente</p>
-              </div>
+              <MovementTrendLineChart data={lineData} />
             </Card>
           </div>
 
